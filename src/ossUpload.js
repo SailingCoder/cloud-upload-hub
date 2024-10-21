@@ -3,95 +3,105 @@ const path = require('path')
 const fs = require('fs')
 
 class UploadAliOss {
-  constructor({ bucket, accessKeyId, accessKeySecret, region, uploadFrom, uploadTo, maxRetryCount = 5, headers }) {
-    this.uploadFrom = uploadFrom
-    this.uploadTo = uploadTo
-    this.allFiles = []
-    this.totalFileNum = 0
-    this.successFileNum = 0
-    this.failFileNum = 0
-    this.maxRetryCount = maxRetryCount
-    this.headers = headers
-
-    this.validateOssConfig(bucket, accessKeyId, accessKeySecret)
+  constructor(options) {
     this.client = new OSS({
-      region,
-      accessKeyId,
-      accessKeySecret,
-      bucket
-    })
+      region: options.region,
+      accessKeyId: options.accessKeyId,
+      accessKeySecret: options.accessKeySecret,
+      bucket: options.bucket,
+    });
+    this.uploadFrom = options.uploadFrom;
+    this.uploadTo = options.uploadTo;
+    this.maxRetryCount = options.maxRetryCount || 5;
+    this.headers = options.headers || {};
+    this.concurrencyLimit = options.concurrencyLimit || 10; // 并发上传数量控制
+    this.lastFile = options.lastFile || "index.html"; // 指定优先级文件（默认 index.html）
   }
 
-  validateOssConfig(bucket, accessKeyId, accessKeySecret) {
-    if (!bucket || !accessKeyId || !accessKeySecret) {
-      throw new Error('缺少OSS配置')
-    }
-  }
+  async uploadFile() {
+    const files = this.getFiles(this.uploadFrom);
+    console.log(`共扫描了${files.length}个文件，准备上传到OSS...`);
 
-  async uploadFile(uploadFrom = this.uploadFrom, uploadTo = this.uploadTo) {
-    if (!uploadFrom || !uploadTo) {
-      throw new Error('【uploadFrom】【uploadTo】 为必传参数')
-    }
-
-    const dir = path.join(process.cwd(), uploadFrom)
-    const isDirectory = fs.statSync(dir).isDirectory()
-
-    if (!isDirectory) {
-      this.totalFileNum = 1
-      await this.putOss(uploadTo, uploadFrom)
-      return
-    }
-
-    this.getFileList(uploadFrom)
-    this.totalFileNum = this.allFiles.length
-    console.log(`共扫描了${this.totalFileNum}个文件`)
-
-    for (const file of this.allFiles) {
-      const ossPath = file.replace(uploadFrom, uploadTo)
-      await this.putOss(ossPath, file)
+    const [lastFile, otherFiles] = this.separatelastFile(files);
+    
+    // 先上传非优先文件
+    const tasks = otherFiles.map((file) => () => this.uploadSingleFileWithRetry(file));
+    await this.runConcurrentLimit(tasks, this.concurrencyLimit); // 控制并发上传
+    
+    // 最后上传指定的优先文件
+    if (lastFile) {
+      console.log(`最后上传到OSS的文件：${lastFile}`);
+      await this.uploadSingleFileWithRetry(lastFile); // 上传 index.html
     }
   }
 
-  getFileList(dir) {
-    const files = fs.readdirSync(dir)
-    files.forEach((item) => {
-      const fullpath = path.join(dir, item)
-      const stats = fs.statSync(fullpath)
-      if (stats.isDirectory()) {
-        this.getFileList(fullpath)
+  // 获取所有待上传的文件
+  getFiles(dir) {
+    let fileList = [];
+    const files = fs.readdirSync(dir);
+    files.forEach((file) => {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) {
+        fileList = fileList.concat(this.getFiles(filePath));
       } else {
-        this.allFiles.push(fullpath)
+        fileList.push(filePath);
       }
-    })
+    });
+    return fileList;
   }
 
-  async putOss(ossPath, localPath, requestCount = 1) {
+  // 分离出优先上传的文件
+  separatelastFile(files) {
+    let lastFile = null;
+    const otherFiles = files.filter((file) => {
+      const isPriority = file.endsWith(this.lastFile);
+      if (isPriority) {
+        lastFile = file;
+      }
+      return !isPriority;
+    });
+    return [lastFile, otherFiles];
+  }
+
+  // 上传单个文件，并增加重试机制
+  async uploadSingleFileWithRetry(file, retryCount = 0) {
     try {
-      const result = await this.client.put(ossPath, localPath, { headers: this.headers })
-
-      if (result.res.status === 200) {
-        this.successFileNum++
-        console.log(`第${requestCount}次上传成功: ${localPath}`)
-
-        if (this.successFileNum === this.totalFileNum) {
-          console.log(`======全部文件上传成功(${this.totalFileNum}个)======`)
-        } else if (this.successFileNum + this.failFileNum === this.totalFileNum) {
-          console.log(`======上传结束，共上传${this.totalFileNum}个，成功${this.successFileNum}个，失败${this.failFileNum}个======`)
-        }
+      await this.uploadSingleFile(file);
+    } catch (error) {
+      if (retryCount < this.maxRetryCount) {
+        console.log(`上传OSS失败，正在重试 ${file}，重试次数：${retryCount + 1}`);
+        await this.uploadSingleFileWithRetry(file, retryCount + 1);
+      } else {
+        console.error(`文件上传OSS失败：${file}，错误：`, error);
+        throw error;
       }
-    } catch (e) {
-      console.log(`第${requestCount}次上传失败: ${localPath}`)
-
-      if (requestCount >= this.maxRetryCount) {
-        this.failFileNum++
-        if (this.successFileNum + this.failFileNum === this.totalFileNum) {
-          console.log(`======上传结束，共上传${this.totalFileNum}个，成功${this.successFileNum}个，失败${this.failFileNum}个======`)
-        }
-        return
-      }
-
-      await this.putOss(ossPath, localPath, ++requestCount)
     }
+  }
+
+  // 实际的文件上传函数
+  async uploadSingleFile(file) {
+    const fileName = path.basename(file);
+    const targetPath = path.join(this.uploadTo, fileName);
+
+    // console.log(`正在上传OSS：${file} -> ${targetPath}`);
+    await this.client.put(targetPath, file, {
+      headers: this.headers,
+    });
+  }
+
+  // 并发控制的核心逻辑
+  async runConcurrentLimit(tasks, limit) {
+    const taskQueue = [];
+    while (tasks.length > 0) {
+      while (taskQueue.length < limit && tasks.length > 0) {
+        const task = tasks.shift();
+        const taskPromise = task().finally(() => taskQueue.splice(taskQueue.indexOf(taskPromise), 1));
+        taskQueue.push(taskPromise);
+      }
+      await Promise.race(taskQueue); // 等待最先完成的任务
+    }
+    await Promise.all(taskQueue); // 确保剩余的任务都完成
   }
 }
 
