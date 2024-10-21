@@ -1,0 +1,33 @@
+{
+  "name": "multi-cloud-uploader",
+  "version": "1.0.0",
+  "description": "支持多云存储平台的文件上传，当前支持阿里云 OSS 和腾讯云 COS，未来将扩展到更多云服务。",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "keywords": [
+    "upload",
+    "cloud",
+    "multi-cloud",
+    "oss",
+    "cos",
+    "cloud-storage",
+    "file-upload"
+  ],
+  "author": "sailing",
+  "license": "ISC",
+  "bin": {
+    "multi-cloud-upload": "src/index.js"
+  },
+  "dependencies": {
+    "ali-oss": "^6.17.1",
+    "cos-nodejs-sdk-v5": "^2.14.6",
+    "minimist": "^1.2.6"
+  },
+  "devDependencies": {
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
+}
