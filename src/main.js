@@ -19,6 +19,7 @@ const uploadTo = argv.uploadTo;
 runUpload();
 
 async function runUpload() {
+  const uploaderType = [];
   const uploaders = [];
   const lastFileUploaders = [];
 
@@ -38,7 +39,7 @@ async function runUpload() {
     console.log("没有找到待上传的文件");
     process.exit(0); // 退出程序
   }
-  console.log(`共扫描了${files.length}个文件，准备上传到OSS...`);
+  console.log(`共扫描了${files.length}个文件，准备上传...`);
 
   // 分离出最后上传的文件
   const [lastFile, otherFiles] = separatelastFile(files, lastFileName);
@@ -61,8 +62,8 @@ async function runUpload() {
       headers,
       concurrencyLimit, // 传递并发限制
     });
+    uploaderType.push("OSS");
     uploaders.push(ossUploader.uploadFile(otherFiles));
-
     if (lastFile) {
       lastFileUploaders.push(ossUploader.uploadSingleFileWithRetry(lastFile));
     }
@@ -86,8 +87,8 @@ async function runUpload() {
       headers,
       concurrencyLimit, // 传递并发限制
     });
+    uploaderType.push("COS");
     uploaders.push(cosUploader.uploadFile(otherFiles));
-
     if (lastFile) {
       lastFileUploaders.push(cosUploader.uploadSingleFileWithRetry(lastFile));
     }
@@ -97,7 +98,7 @@ async function runUpload() {
     // 等待所有上传操作完成
     await Promise.all(uploaders);
     await Promise.all(lastFileUploaders);
-    console.log("所有上传操作完成");
+    console.log(`所有文件已成功上传至: ${uploaderType.join(", ")}`);
   } catch (error) {
     console.error("上传过程中发生错误:", err);
   }
@@ -140,7 +141,3 @@ if (argv.help) {
   `);
   process.exit(0);
 }
-
-// node index.js --ossConfig=config/ossConfig.json --ossUploadFrom=./localFile.txt --ossUploadTo=/remote/path/ --ossHeaders='{"x-my-header":"my-value"}' --cosConfig=config/cosConfig.json --cosUploadFrom=./localFile.txt --cosUploadTo=/remote/path/ --cosHeaders='{"x-my-header":"my-value"}'
-// node index.js --ossConfig=config/ossConfig.json --ossUploadFrom=./localFile.txt --ossUploadTo=/remote/path/ --ossHeaders='{"x-my-header":"my-value"}' --cosConfig=config/cosConfig.json --cosUploadFrom=./localFile.txt --cosUploadTo=/remote/path/ --cosHeaders='{"x-my-header":"my-value"}'
-// node index.js --ossConfig=ossConfig.json --uploadFrom=./dist --uploadTo=/static --lastFile=index.html

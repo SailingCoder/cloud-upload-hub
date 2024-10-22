@@ -10,8 +10,6 @@
 - **重试机制**：支持重试机制，确保文件上传的可靠性
 
 
-以下是一个示例 `README.md` 文件，适用于你的上传工具项目。根据你的需求和项目特点，您可以进行适当修改和扩展。
-
 ## 安装
 
 您可以将此工具作为npm包安装到您的项目中：
@@ -27,6 +25,19 @@ npm install multi-cloud-uploader --save-dev
 ```bash
 multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test --ossConfig=./oss.test.conf.json 
 ```
+
+或者，在 package.json 配置：
+
+```json
+"scripts": {
+  "uploader:tice": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/tice  --config=./oss.tice.conf.json",
+  "uploader:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test  --config=./oss.test.conf.json",
+  "uploader:gray": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/gray  --config=./oss.gray.conf.json",
+  "uploader:prod": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/prod  --config=./oss.prod.conf.json"
+}
+```
+
+执行 `npm run uploader:tice` 命令。
 
 ### 参数说明
 
@@ -47,13 +58,13 @@ multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test --ossConfig=./oss
 multi-cloud-uploader --help
 ```
 
+## 配置文件示例
+
 ### 示例
 
 ```bash
 multi-cloud-uploader --uploadFrom=path/to/uploadFrom --uploadTo=path/to/uploadTo --headers='{"x-my-header":"my-value"}' --ossConfig=config/ossConfig.json  --cosConfig=config/cosConfig.json
 ```
-
-## 配置文件示例
 
 ### 阿里云OSS配置（ossConfig.json）
 
