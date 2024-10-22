@@ -15,50 +15,11 @@ class UploadCos {
     this.maxRetryCount = options.maxRetryCount || 5;
     this.headers = options.headers || {};
     this.concurrencyLimit = options.concurrencyLimit || 10; // 并发上传数量控制
-    this.lastFile = options.lastFile || "index.html"; // 指定优先级文件
   }
 
-  async uploadFile() {
-    const files = this.getFiles(this.uploadFrom);
-    console.log(`共扫描了${files.length}个文件，准备上传到COS...`);
-
-    const [lastFile, otherFiles] = this.separatelastFile(files);
-    
-    const tasks = otherFiles.map((file) => () => this.uploadSingleFileWithRetry(file));
+  async uploadFile(files) {
+    const tasks = files.map((file) => () => this.uploadSingleFileWithRetry(file));
     await this.runConcurrentLimit(tasks, this.concurrencyLimit); // 先并发上传其它文件
-    
-    // 最后上传优先文件
-    if (lastFile) {
-      console.log(`最后上传到COS文件：${lastFile}`);
-      await this.uploadSingleFileWithRetry(lastFile); // 上传 index.html
-    }
-  }
-
-  getFiles(dir) {
-    let fileList = [];
-    const files = fs.readdirSync(dir);
-    files.forEach((file) => {
-      const filePath = path.join(dir, file);
-      const stat = fs.statSync(filePath);
-      if (stat.isDirectory()) {
-        fileList = fileList.concat(this.getFiles(filePath));
-      } else {
-        fileList.push(filePath);
-      }
-    });
-    return fileList;
-  }
-
-  separatelastFile(files) {
-    let lastFile = null;
-    const otherFiles = files.filter((file) => {
-      const isPriority = file.endsWith(this.lastFile);
-      if (isPriority) {
-        lastFile = file;
-      }
-      return !isPriority;
-    });
-    return [lastFile, otherFiles];
   }
 
   async uploadSingleFileWithRetry(file, retryCount = 0) {

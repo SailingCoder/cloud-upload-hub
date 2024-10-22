@@ -2,93 +2,106 @@
 const path = require("path");
 const fs = require("fs");
 const minimist = require("minimist");
+const { getUploadFiles, separatelastFile } = require("./utils/file.js")
 const { UploadAliOss } = require("./ossUpload.js");
 const { UploadCos } = require("./cosUpload.js");
 
 const cwd = process.cwd(); // 命令执行所在目录
 const argv = minimist(process.argv.slice(2)); // 获取并解析传过来的参数
 
-const uploaders = [];
+const concurrencyLimit = argv.concurrency || 10; // 并发上传数控制，默认为 10
+const lastFileName = argv.lastFile || "index.html"; // 默认最后上传的文件为 index.html
+const maxRetryCount = argv.maxRetryCount || 5; // 最大重试次数，默认为 5
+const uploadFrom = argv.uploadFrom;
+const uploadTo = argv.uploadTo;
 
-if (!argv.ossConfig && !argv.cosConfig) {
-  console.error("请提供【ossConfig】或【cosConfig】进行上传。");
-  process.exit(1); // 退出程序
-}
 
-// 并发上传数控制，默认为 10
-const concurrencyLimit = argv.concurrency || 10;
+runUpload();
 
-// OSS 上传
-if (argv.ossConfig) {
-  const uploadFrom = argv.ossUploadFrom || argv.uploadFrom;
-  const uploadTo = argv.ossUploadTo || argv.uploadTo;
-  if (!uploadFrom || !uploadTo) {
-    throw new Error("OSS 上传需要提供【uploadFrom】和【uploadTo】参数。");
-  }
-
-  const ossConfig = loadConfig(argv.ossConfig);
-  const isValid = ossConfig.bucket && ossConfig.accessKeyId && ossConfig.accessKeySecret && ossConfig.region;
-  if (!isValid) {
-    throw new Error("缺少 OSS 配置。请检查配置文件中的 bucket、accessKeyId、accessKeySecret 和 region 是否存在。");
-  }
-
-  const headers = argv.ossHeaders ? JSON.parse(argv.ossHeaders) : {}; // 解析自定义头部
-
-  const ossUploader = new UploadAliOss({
-    bucket: ossConfig.bucket,
-    accessKeyId: ossConfig.accessKeyId,
-    accessKeySecret: ossConfig.accessKeySecret,
-    region: ossConfig.region,
-    uploadFrom,
-    uploadTo,
-    maxRetryCount: argv.maxRetryCount || 5,
-    headers,
-    concurrencyLimit, // 传递并发限制
-    lastFile: argv.lastFile || "index.html",
-  });
-  uploaders.push(ossUploader.uploadFile());
-}
-
-// COS 上传
-if (argv.cosConfig) {
-  const uploadFrom = argv.cosUploadFrom || argv.uploadFrom;
-  const uploadTo = argv.cosUploadTo || argv.uploadTo;
+async function runUpload() {
+  const uploaders = [];
+  const lastFileUploaders = [];
 
   if (!uploadFrom || !uploadTo) {
-    throw new Error("COS 上传需要提供【uploadFrom】和【uploadTo】参数。");
+    console.error("请提供【uploadFrom】和【uploadTo】参数进行上传。");
+    process.exit(1); // 退出程序
+  }
+  
+  if (!argv.ossConfig && !argv.cosConfig) {
+    console.error("请提供【ossConfig】或【cosConfig】进行上传。");
+    process.exit(1); // 退出程序
   }
 
-  const cosConfig = loadConfig(argv.cosConfig);
-  const isValid = cosConfig.Bucket && cosConfig.SecretKey && cosConfig.SecretId && cosConfig.Region;
-  if (!isValid) {
-    throw new Error("缺少 COS 配置。请检查配置文件中的 Bucket、SecretKey、SecretId 和 Region 是否存在。");
+  // 获取所有待上传的文件
+  const files = getUploadFiles(uploadFrom);
+  if (files.length === 0) {
+    console.log("没有找到待上传的文件");
+    process.exit(0); // 退出程序
+  }
+  console.log(`共扫描了${files.length}个文件，准备上传到OSS...`);
+
+  // 分离出最后上传的文件
+  const [lastFile, otherFiles] = separatelastFile(files, lastFileName);
+
+  // OSS 上传
+  if (argv.ossConfig) {
+    const ossConfig = loadConfig(argv.ossConfig);
+    validateConfig(ossConfig, ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], 'OSS');
+
+    const headers = (argv.headers || argv.ossHeaders) ? JSON.parse(argv.ossHeaders) : {}; // 解析自定义头部
+
+    const ossUploader = new UploadAliOss({
+      bucket: ossConfig.bucket,
+      accessKeyId: ossConfig.accessKeyId,
+      accessKeySecret: ossConfig.accessKeySecret,
+      region: ossConfig.region,
+      uploadFrom,
+      uploadTo,
+      maxRetryCount,
+      headers,
+      concurrencyLimit, // 传递并发限制
+    });
+    uploaders.push(ossUploader.uploadFile(otherFiles));
+
+    if (lastFile) {
+      lastFileUploaders.push(ossUploader.uploadSingleFileWithRetry(lastFile));
+    }
   }
 
-  const headers = argv.cosHeaders ? JSON.parse(argv.cosHeaders) : {};
+  // COS 上传
+  if (argv.cosConfig) {
+    const cosConfig = loadConfig(argv.cosConfig);
+    validateConfig(cosConfig, ['Bucket', 'SecretKey', 'SecretId', 'Region'], 'COS');
 
-  const cosUploader = new UploadCos({
-    Bucket: cosConfig.Bucket,
-    Region: cosConfig.Region,
-    SecretId: cosConfig.SecretId,
-    SecretKey: cosConfig.SecretKey,
-    uploadFrom,
-    uploadTo,
-    maxRetryCount: argv.maxRetryCount || 5,
-    headers,
-    concurrencyLimit, // 传递并发限制
-    lastFile: argv.lastFile || "index.html",
-  });
-  uploaders.push(cosUploader.uploadFile());
-}
+    const headers = (argv.headers || argv.cosHeaders) ? JSON.parse(argv.cosHeaders) : {}; // 解析自定义头部
 
-// 等待所有上传操作完成
-Promise.all(uploaders)
-  .then(() => {
+    const cosUploader = new UploadCos({
+      Bucket: cosConfig.Bucket,
+      Region: cosConfig.Region,
+      SecretId: cosConfig.SecretId,
+      SecretKey: cosConfig.SecretKey,
+      uploadFrom,
+      uploadTo,
+      maxRetryCount,
+      headers,
+      concurrencyLimit, // 传递并发限制
+    });
+    uploaders.push(cosUploader.uploadFile(otherFiles));
+
+    if (lastFile) {
+      lastFileUploaders.push(cosUploader.uploadSingleFileWithRetry(lastFile));
+    }
+  }
+
+  try {
+    // 等待所有上传操作完成
+    await Promise.all(uploaders);
+    await Promise.all(lastFileUploaders);
     console.log("所有上传操作完成");
-  })
-  .catch((err) => {
+  } catch (error) {
     console.error("上传过程中发生错误:", err);
-  });
+  }
+}
 
 function loadConfig(configPath) {
   let config = {};
@@ -101,6 +114,14 @@ function loadConfig(configPath) {
   return config;
 }
 
+function validateConfig(config, requiredKeys, type='') {
+  const missingKeys = requiredKeys.filter(key => !config[key]);
+  if (missingKeys.length > 0) {
+    console.error(`缺少${type}配置: 请检查配置文件中的 ${missingKeys.join(', ')} 是否存在。`);
+    process.exit(1);
+  }
+}
+
 // 如果用户输入 --help，显示命令使用说明
 if (argv.help) {
   console.log(`
@@ -110,14 +131,11 @@ if (argv.help) {
     --uploadFrom       指定上传源文件夹路径。
     --uploadTo         指定上传目标路径。
     --maxRetryCount    指定最大重试次数（默认为5）。
-    --ossHeaders       指定自定义OSS请求头信息（JSON格式）。
-    --cosHeaders       指定自定义COS请求头信息（JSON格式）。
     --concurrency      指定并发上传的数量限制（默认为10）。
     --lastFile         最后一个上传的文件（默认为 index.html）。
-    --ossUploadFrom    指定 OSS 上传源文件夹路径。
-    --ossUploadTo      指定 OSS 上传目标路径。
-    --cosUploadFrom    指定 COS 上传源文件夹路径。
-    --cosUploadTo      指定 COS 上传目标路径。
+    --headers          指定自定义请求头信息（JSON格式）。
+    --ossHeaders       指定自定义OSS请求头信息（JSON格式）。
+    --cosHeaders       指定自定义COS请求头信息（JSON格式）。
     --help             显示帮助信息。
   `);
   process.exit(0);

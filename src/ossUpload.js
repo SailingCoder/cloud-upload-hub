@@ -15,57 +15,15 @@ class UploadAliOss {
     this.maxRetryCount = options.maxRetryCount || 5;
     this.headers = options.headers || {};
     this.concurrencyLimit = options.concurrencyLimit || 10; // 并发上传数量控制
-    this.lastFile = options.lastFile || "index.html"; // 指定优先级文件（默认 index.html）
   }
 
-  async uploadFile() {
-    const files = this.getFiles(this.uploadFrom);
-    console.log(`共扫描了${files.length}个文件，准备上传到OSS...`);
-
-    const [lastFile, otherFiles] = this.separatelastFile(files);
-    
-    // 先上传非优先文件
-    const tasks = otherFiles.map((file) => () => this.uploadSingleFileWithRetry(file));
+  async uploadFile(files) {
+    const tasks = files.map((file) => () => this.uploadSingleFileWithRetry(file));
     await this.runConcurrentLimit(tasks, this.concurrencyLimit); // 控制并发上传
-    
-    // 最后上传指定的优先文件
-    if (lastFile) {
-      console.log(`最后上传到OSS的文件：${lastFile}`);
-      await this.uploadSingleFileWithRetry(lastFile); // 上传 index.html
-    }
-  }
-
-  // 获取所有待上传的文件
-  getFiles(dir) {
-    let fileList = [];
-    const files = fs.readdirSync(dir);
-    files.forEach((file) => {
-      const filePath = path.join(dir, file);
-      const stat = fs.statSync(filePath);
-      if (stat.isDirectory()) {
-        fileList = fileList.concat(this.getFiles(filePath));
-      } else {
-        fileList.push(filePath);
-      }
-    });
-    return fileList;
-  }
-
-  // 分离出优先上传的文件
-  separatelastFile(files) {
-    let lastFile = null;
-    const otherFiles = files.filter((file) => {
-      const isPriority = file.endsWith(this.lastFile);
-      if (isPriority) {
-        lastFile = file;
-      }
-      return !isPriority;
-    });
-    return [lastFile, otherFiles];
   }
 
   // 上传单个文件，并增加重试机制
-  async uploadSingleFileWithRetry(file, retryCount = 0) {
+  async uploadSingleFileWithRetry(file, retryCount = 1) {
     try {
       await this.uploadSingleFile(file);
     } catch (error) {
