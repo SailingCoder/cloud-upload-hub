@@ -17,7 +17,7 @@
 您可以将此工具作为npm包安装到您的项目中：
 
 ```bash
-npm install multi-cloud-uploader
+npm install multi-cloud-uploader --save-dev 
 ```
 
 ## 使用方法
@@ -25,7 +25,7 @@ npm install multi-cloud-uploader
 在命令行中运行以下命令：
 
 ```bash
-multi-cloud-uploader --ossConfig=path/to/ossConfig.json --uploadFrom=path/to/uploadFrom --uploadTo=path/to/uploadTo --finalFile=index.html
+multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test --ossConfig=./oss.test.conf.json 
 ```
 
 ### 参数说明
@@ -34,12 +34,23 @@ multi-cloud-uploader --ossConfig=path/to/ossConfig.json --uploadFrom=path/to/upl
 - `--cosConfig`: 指向腾讯云COS配置文件的路径（JSON格式），该文件应包含 `Bucket`、`SecretId`、`SecretKey` 和 `Region`。
 - `--uploadFrom`: 要上传的本地目录或文件的路径。
 - `--uploadTo`: 在OSS或COS上存储文件的目标路径。
-- `--finalFile`: 指定最后上传的文件，通常为入口文件（例如 `index.html`）。
+- `--lastFile`: 指定最后上传的文件，通常为入口文件（默认 `index.html`）。
+- `--maxRetryCount`: 指定最大重试次数（默认为5）。
+- `--concurrency`: 指定并发上传的数量限制（默认为10）。
+- `--headers`: 指定自定义请求头信息（JSON格式）。
+- `--ossHeaders`: 指定自定义OSS请求头信息（JSON格式）。
+- `--cosHeaders`: 指定自定义COS请求头信息（JSON格式）。
+
+### 显示帮助信息
+
+```bash
+multi-cloud-uploader --help
+```
 
 ### 示例
 
 ```bash
-multi-cloud-uploader --ossConfig=ossConfig.json --uploadFrom=./dist --uploadTo=/static --finalFile=index.html
+multi-cloud-uploader --uploadFrom=path/to/uploadFrom --uploadTo=path/to/uploadTo --headers='{"x-my-header":"my-value"}' --ossConfig=config/ossConfig.json  --cosConfig=config/cosConfig.json
 ```
 
 ## 配置文件示例
@@ -69,13 +80,3 @@ multi-cloud-uploader --ossConfig=ossConfig.json --uploadFrom=./dist --uploadTo=/
 ## 许可
 
 该项目使用 [MIT 许可证](LICENSE)。
-
-
-### 注意事项
-
-1. **替换信息**：确保替换 `your-package-name` 和 `your-repo` 为你的实际包名和GitHub存储库地址。
-2. **内容补充**：根据实际项目的复杂性和功能，您可能需要添加更多的说明、使用示例或贡献指南等。
-3. **格式**：使用Markdown格式以确保在GitHub或其他平台上良好的可读性。
-
-
-如果你需要在前端实现灵活的多云存储上传方案，**multi-cloud-uploader** 将是你理想的选择。
