@@ -18,7 +18,7 @@
   "author": "sailing",
   "license": "ISC",
   "bin": {
-    "multi-cloud-upload": "src/index.js"
+    "multi-cloud-upload": "src/main.js"
   },
   "dependencies": {
     "ali-oss": "^6.17.1",
