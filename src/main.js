@@ -3,8 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const minimist = require("minimist");
 const { getUploadFiles, separatelastFile } = require("./utils/file.js")
-const { UploadAliOss } = require("./ossUpload.js");
-const { UploadCos } = require("./cosUpload.js");
+const { UploadAliOss } = require("./upload/ossUpload.js");
+const { UploadCos } = require("./upload/cosUpload.js");
 
 const cwd = process.cwd(); // 命令执行所在目录
 const argv = minimist(process.argv.slice(2)); // 获取并解析传过来的参数

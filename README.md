@@ -66,14 +66,10 @@ multi-cloud-uploader --ossConfig=ossConfig.json --uploadFrom=./dist --uploadTo=/
 }
 ```
 
-## 贡献
-
-欢迎提交问题、建议和贡献代码！请确保在提交前阅读 [贡献指南](CONTRIBUTING.md)。
-
 ## 许可
 
 该项目使用 [MIT 许可证](LICENSE)。
-```
+
 
 ### 注意事项
 
