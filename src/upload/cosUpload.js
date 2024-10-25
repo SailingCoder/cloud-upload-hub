@@ -1,6 +1,7 @@
 const COS = require("cos-nodejs-sdk-v5");
 const path = require("path");
 const fs = require("fs");
+const { runConcurrentLimit } = require("../utils/tasks");
 
 class UploadCos {
   constructor(options) {
@@ -19,15 +20,16 @@ class UploadCos {
 
   async uploadFile(files) {
     const tasks = files.map((file) => () => this.uploadSingleFileWithRetry(file));
-    await this.runConcurrentLimit(tasks, this.concurrencyLimit); // 先并发上传其它文件
+    await runConcurrentLimit(tasks, this.concurrencyLimit); // 先并发上传
   }
 
-  async uploadSingleFileWithRetry(file, retryCount = 0) {
+  async uploadSingleFileWithRetry(file, retryCount = 1) {
     try {
       await this.uploadSingleFile(file);
+      console.log(`第${retryCount}次上传成功:  ${file}`); // 添加成功日志
     } catch (error) {
       if (retryCount < this.maxRetryCount) {
-        console.log(`上传COS失败，正在重试 ${file}，重试次数：${retryCount + 1}`);
+        console.log(`上传COS失败，正在重试 ${file}，重试次数：${retryCount}`);
         await this.uploadSingleFileWithRetry(file, retryCount + 1);
       } else {
         console.error(`文件上传COS失败：${file}，错误：`, error);
@@ -59,19 +61,6 @@ class UploadCos {
         }
       );
     });
-  }
-
-  async runConcurrentLimit(tasks, limit) {
-    const taskQueue = [];
-    while (tasks.length > 0) {
-      while (taskQueue.length < limit && tasks.length > 0) {
-        const task = tasks.shift();
-        const taskPromise = task().finally(() => taskQueue.splice(taskQueue.indexOf(taskPromise), 1));
-        taskQueue.push(taskPromise);
-      }
-      await Promise.race(taskQueue); // 等待最先完成的任务
-    }
-    await Promise.all(taskQueue); // 确保剩余的任务都完成
   }
 }
 
