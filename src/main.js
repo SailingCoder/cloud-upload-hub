@@ -15,94 +15,108 @@ const maxRetryCount = argv.maxRetryCount || 5; // 最大重试次数，默认为
 const uploadFrom = argv.uploadFrom;
 const uploadTo = argv.uploadTo;
 
+let ossUploader = null;
+let cosUploader = null;
 
 runUpload();
 
 async function runUpload() {
-  const uploaderType = [];
-  const uploaders = [];
+  try {
+    if (!uploadFrom || !uploadTo) {
+      console.error("请提供【uploadFrom】和【uploadTo】参数进行上传。");
+      process.exit(1); // 退出程序
+    }
+    
+    if (!argv.ossConfig && !argv.cosConfig) {
+      console.error("请提供【ossConfig】或【cosConfig】进行上传。");
+      process.exit(1); // 退出程序
+    }
+
+    const files = getUploadFiles(uploadFrom);
+    if (files.length === 0) {
+      console.log("没有找到待上传的文件");
+      process.exit(0);
+    }
+    const [lastFile, otherFiles] = separatelastFile(files, lastFileName);
+
+    ossUploader = argv.ossConfig ? await setupOssUploader() : null;
+    cosUploader = argv.cosConfig ? await setupCosUploader() : null;
+
+    console.log(`======共扫描了${files.length}个文件，准备上传。======`);
+    await uploadFiles(otherFiles, lastFile); // 上传所有文件
+    await uploadLastFile(lastFile); // 上传最后一个生效文件
+    console.log(`======全部文件上传成功(${files.length}个)======`);
+  } catch (error) {
+    console.error("上传过程中发生错误:", error);
+  }
+}
+
+async function uploadFiles(otherFiles, lastFile) {
+  if (ossUploader) {
+    console.log("开始上传资源到 OSS...");
+    await ossUploader.uploadFile(otherFiles);
+    console.log(`OSS 上传完成，共上传了 ${otherFiles.length} 个资源。${lastFile ? `剩余 1 个生效文件` : ''}`);
+  }
+
+  if (cosUploader) {
+    console.log("开始上传资源到 COS...");
+    await cosUploader.uploadFile(otherFiles);
+    console.log(`COS 上传完成，共上传了 ${otherFiles.length} 个资源。${lastFile ? `剩余 1 个生效文件` : ''}`);
+  }
+}
+
+async function uploadLastFile(lastFile) {
+  if (!lastFile) {
+    return;
+  }
+  console.log(`开始上传最后一个生效文件: ${lastFile}`);
+
   const lastFileUploaders = [];
-
-  if (!uploadFrom || !uploadTo) {
-    console.error("请提供【uploadFrom】和【uploadTo】参数进行上传。");
-    process.exit(1); // 退出程序
+  if (ossUploader) {
+    lastFileUploaders.push(ossUploader.uploadSingleFileWithRetry(lastFile));
   }
-  
-  if (!argv.ossConfig && !argv.cosConfig) {
-    console.error("请提供【ossConfig】或【cosConfig】进行上传。");
-    process.exit(1); // 退出程序
-  }
-
-  // 获取所有待上传的文件
-  const files = getUploadFiles(uploadFrom);
-  if (files.length === 0) {
-    console.log("没有找到待上传的文件");
-    process.exit(0); // 退出程序
-  }
-  console.log(`共扫描了${files.length}个文件，准备上传...`);
-
-  // 分离出最后上传的文件
-  const [lastFile, otherFiles] = separatelastFile(files, lastFileName);
-
-  // OSS 上传
-  if (argv.ossConfig) {
-    const ossConfig = loadConfig(argv.ossConfig);
-    validateConfig(ossConfig, ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], 'OSS');
-
-    const headers = (argv.headers || argv.ossHeaders) ? JSON.parse(argv.ossHeaders) : {}; // 解析自定义头部
-
-    const ossUploader = new UploadAliOss({
-      bucket: ossConfig.bucket,
-      accessKeyId: ossConfig.accessKeyId,
-      accessKeySecret: ossConfig.accessKeySecret,
-      region: ossConfig.region,
-      uploadFrom,
-      uploadTo,
-      maxRetryCount,
-      headers,
-      concurrencyLimit, // 传递并发限制
-    });
-    uploaderType.push("OSS");
-    uploaders.push(ossUploader.uploadFile(otherFiles));
-    if (lastFile) {
-      lastFileUploaders.push(ossUploader.uploadSingleFileWithRetry(lastFile));
-    }
-  }
-
-  // COS 上传
-  if (argv.cosConfig) {
-    const cosConfig = loadConfig(argv.cosConfig);
-    validateConfig(cosConfig, ['Bucket', 'SecretKey', 'SecretId', 'Region'], 'COS');
-
-    const headers = (argv.headers || argv.cosHeaders) ? JSON.parse(argv.cosHeaders) : {}; // 解析自定义头部
-
-    const cosUploader = new UploadCos({
-      Bucket: cosConfig.Bucket,
-      Region: cosConfig.Region,
-      SecretId: cosConfig.SecretId,
-      SecretKey: cosConfig.SecretKey,
-      uploadFrom,
-      uploadTo,
-      maxRetryCount,
-      headers,
-      concurrencyLimit, // 传递并发限制
-    });
-    uploaderType.push("COS");
-    uploaders.push(cosUploader.uploadFile(otherFiles));
-    if (lastFile) {
-      lastFileUploaders.push(cosUploader.uploadSingleFileWithRetry(lastFile));
-    }
+  if (cosUploader) {
+    lastFileUploaders.push(cosUploader.uploadSingleFileWithRetry(lastFile));
   }
 
   try {
-    // 等待所有上传操作完成
-    await Promise.all(uploaders);
     await Promise.all(lastFileUploaders);
-    console.log(`所有文件已成功上传至: ${uploaderType.join(", ")}`);
+    console.log(`最后一个生效文件上传成功: ${lastFile}`);
   } catch (error) {
-    console.error("上传过程中发生错误:", err);
+    console.error("最后一个生效文件上传失败:", error);
   }
 }
+
+// 设置 OSS 上传器
+async function setupOssUploader() {
+  const ossConfig = loadConfig(argv.ossConfig);
+  validateConfig(ossConfig, ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], 'OSS');
+  const headers = (argv.headers || argv.ossHeaders) ? JSON.parse(argv.ossHeaders) : {};
+  return new UploadAliOss({
+    ...ossConfig,
+    uploadFrom,
+    uploadTo,
+    maxRetryCount,
+    headers,
+    concurrencyLimit,
+  });
+}
+
+// 设置 COS 上传器
+async function setupCosUploader() {
+  const cosConfig = loadConfig(argv.cosConfig);
+  validateConfig(cosConfig, ['Bucket', 'SecretKey', 'SecretId', 'Region'], 'COS');
+  const headers = (argv.headers || argv.cosHeaders) ? JSON.parse(argv.cosHeaders) : {};
+  return new UploadCos({
+    ...cosConfig,
+    uploadFrom,
+    uploadTo,
+    maxRetryCount,
+    headers,
+    concurrencyLimit,
+  });
+}
+
 
 function loadConfig(configPath) {
   let config = {};

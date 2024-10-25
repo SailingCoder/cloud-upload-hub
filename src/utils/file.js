@@ -1,6 +1,16 @@
+const fs = require("fs");
+const path = require("path");
+
 // 获取所有待上传的文件
 function getUploadFiles(dir) {
     let fileList = [];
+
+    const stat = fs.statSync(dir);
+    // 如果是文件，直接添加到列表
+    if (stat.isFile()) {
+        return [dir]; // 返回包含该文件的数组
+    }
+    
     const files = fs.readdirSync(dir);
     files.forEach((file) => {
         const filePath = path.join(dir, file);
