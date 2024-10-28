@@ -19,7 +19,7 @@
 通过 npm 安装此工具到项目中：
 
 ```bash
-npm install multi-cloud-uploader --save-dev 
+npm install mulcloud-uploader --save-dev 
 ```
 
 ## 使用方法

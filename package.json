@@ -5,9 +5,9 @@
   "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "uploaderOSS:tice": "talcloud-multi-uploader --uploadFrom=src --uploadTo=test/sailing  --ossConfig=./oss.tice.conf.json",
-    "uploaderCOS:tice": "talcloud-multi-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./cos.tice.conf.json",
-    "uploader:tice": "talcloud-multi-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./cos.tice.conf.json --ossConfig=./oss.tice.conf.json"
+    "uploaderOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --ossConfig=./oss.tice.conf.json",
+    "uploaderCOS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./cos.tice.conf.json",
+    "uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./cos.tice.conf.json --ossConfig=./oss.tice.conf.json"
   },
   "keywords": [
     "upload",
@@ -18,10 +18,10 @@
     "cloud-storage",
     "file-upload"
   ],
-  "author": "sailing",
-  "license": "ISC",
+  "author": "Sailing",
+  "license": "MIT",
   "bin": {
-    "talcloud-multi-uploader": "src/main.js"
+    "multi-cloud-uploader": "src/main.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
@@ -30,9 +30,5 @@
     "ali-oss": "^6.17.1",
     "cos-nodejs-sdk-v5": "^2.14.6",
     "minimist": "^1.2.6"
-  },
-  "devDependencies": {
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
   }
 }
