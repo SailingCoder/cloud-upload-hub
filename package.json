@@ -23,6 +23,9 @@
   "bin": {
     "talcloud-multi-uploader": "src/main.js"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "dependencies": {
     "ali-oss": "^6.17.1",
     "cos-nodejs-sdk-v5": "^2.14.6",
