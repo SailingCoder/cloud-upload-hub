@@ -1,6 +1,6 @@
 {
   "name": "multi-cloud-uploader",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "支持多云存储平台的文件上传，当前支持阿里云 OSS 和腾讯云 COS，未来将扩展到更多云服务。",
   "main": "./src/main.js",
   "scripts": {
