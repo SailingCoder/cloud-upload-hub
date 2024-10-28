@@ -6,9 +6,8 @@
 - **易于扩展**：未来将支持更多的云存储服务，如 AWS S3、Google Cloud Storage 等。
 - **简化集成**：通过统一的接口，让文件上传变得简单且一致。
 - **请求头**：支持配置自定义请求头。
-- **最后上传的文件**：支持指定最后上传的文件（例如 `index.html`）。
+- **最后上传的文件**：支持指定最后上传的文件（默认 `index.html`）。
 - **重试机制**：支持重试机制，确保文件上传的可靠性
-
 
 ## 安装
 
@@ -30,14 +29,31 @@ multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test --ossConfig=./oss
 
 ```json
 "scripts": {
-  "uploader:tice": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/tice  --config=./oss.tice.conf.json",
-  "uploader:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test  --config=./oss.test.conf.json",
-  "uploader:gray": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/gray  --config=./oss.gray.conf.json",
-  "uploader:prod": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/prod  --config=./oss.prod.conf.json"
+  "uploader:tice": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/tice  --ossConfig=./oss.tice.conf.json",
+  "uploader:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/test  --ossConfig=./oss.test.conf.json",
+  "uploader:gray": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/gray  --ossConfig=./oss.gray.conf.json",
+  "uploader:prod": "multi-cloud-uploader --uploadFrom=dist --uploadTo=project/prod  --ossConfig=./oss.prod.conf.json"
 }
 ```
 
 执行 `npm run uploader:tice` 命令。
+
+```json
+====== 共扫描了7个文件，开始上传资源文件。 ======
+
+[OSS][SUCCESS][1/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
+[OSS][SUCCESS][2/7]: src/main.js -> test/sailing/src/main.js
+[OSS][SUCCESS][3/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
+[OSS][SUCCESS][4/7]: src/utils/file.js -> test/sailing/src/utils/file.js
+[OSS][SUCCESS][5/7]: src/.DS_Store -> test/sailing/src/.DS_Store
+[OSS][SUCCESS][6/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
+
+====== 开始上传生效文件。 ====== 
+
+[OSS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+
+====== 全部文件上传成功(7个) ======
+```
 
 ### 参数说明
 
@@ -64,6 +80,31 @@ multi-cloud-uploader --help
 
 ```bash
 multi-cloud-uploader --uploadFrom=path/to/uploadFrom --uploadTo=path/to/uploadTo --headers='{"x-my-header":"my-value"}' --ossConfig=config/ossConfig.json  --cosConfig=config/cosConfig.json
+```
+
+```json
+====== 共扫描了7个文件，开始上传资源文件。 ======
+
+[OSS][SUCCESS][1/7]: src/.DS_Store -> test/sailing/src/.DS_Store
+[OSS][SUCCESS][2/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
+[OSS][SUCCESS][3/7]: src/main.js -> test/sailing/src/main.js
+[OSS][SUCCESS][4/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
+[OSS][SUCCESS][5/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
+[OSS][SUCCESS][6/7]: src/utils/file.js -> test/sailing/src/utils/file.js
+
+[COS][SUCCESS][1/7]: src/main.js -> test/sailing/src/main.js
+[COS][SUCCESS][2/7]: src/.DS_Store -> test/sailing/src/.DS_Store
+[COS][SUCCESS][3/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
+[COS][SUCCESS][4/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
+[COS][SUCCESS][5/7]: src/utils/file.js -> test/sailing/src/utils/file.js
+[COS][SUCCESS][6/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
+
+====== 开始上传生效文件。 ====== 
+
+[OSS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+[COS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+
+====== 全部文件上传成功(7个) ======
 ```
 
 ### 阿里云OSS配置（ossConfig.json）

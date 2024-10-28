@@ -16,6 +16,8 @@ class UploadCos {
     this.maxRetryCount = options.maxRetryCount || 5;
     this.headers = options.headers || {};
     this.concurrencyLimit = options.concurrencyLimit || 10; // 并发上传数量控制
+    this.successTotal = 0;
+    this.fileTotal = options.fileTotal || 0
   }
 
   async uploadFile(files) {
@@ -23,25 +25,24 @@ class UploadCos {
     await runConcurrentLimit(tasks, this.concurrencyLimit); // 先并发上传
   }
 
-  async uploadSingleFileWithRetry(file, retryCount = 1) {
+  async uploadSingleFileWithRetry(file, retryCount = 0) {
     try {
-      await this.uploadSingleFile(file);
-      console.log(`第${retryCount}次上传成功:  ${file}`); // 添加成功日志
+      const targetPath = path.join(this.uploadTo, file);
+      await this.uploadSingleFile(file, targetPath);
+      this.successTotal++;
+      console.log(`[COS][SUCCESS][${this.successTotal}/${this.fileTotal}]${retryCount ? `(${retryCount + 1})`: ''}: ${file} -> ${targetPath}`) // 添加成功日志
     } catch (error) {
       if (retryCount < this.maxRetryCount) {
-        console.log(`上传COS失败，正在重试 ${file}，重试次数：${retryCount}`);
+        // console.warn(`[COS][ERROR]: 上传 COS 异常，正在重试 ${file}，重试次数：${retryCount + 1}`);
         await this.uploadSingleFileWithRetry(file, retryCount + 1);
       } else {
-        console.error(`文件上传COS失败：${file}，错误：`, error);
+        console.error(`[COS][ERROR]: 上传 COS 失败：${file}，错误：`, error);
         throw error;
       }
     }
   }
 
-  async uploadSingleFile(file) {
-    const fileName = path.basename(file);
-    const targetPath = path.join(this.uploadTo, fileName);
-
+  async uploadSingleFile(file, targetPath) {
     // console.log(`正在上传COS：${file} -> ${targetPath}`);
     await new Promise((resolve, reject) => {
       this.client.putObject(
