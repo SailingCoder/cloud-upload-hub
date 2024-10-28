@@ -18,6 +18,12 @@ const uploadTo = argv.uploadTo;
 let ossUploader = null;
 let cosUploader = null;
 
+// 如果用户输入 --help，显示命令使用说明
+if (argv.help) {
+  displayHelp();
+  process.exit(0);
+}
+
 runUpload();
 
 async function runUpload() {
@@ -45,8 +51,10 @@ async function runUpload() {
     console.log(`====== 共扫描了${files.length}个文件，开始上传资源文件。 ======\n`);
     await uploadFiles(otherFiles); // 上传资源文件
 
-    console.log(`\n====== 开始上传生效文件。 ====== \n`);
-    await uploadLastFile(lastFile); // 上传生效文件
+    if (lastFile) {
+      console.log(`\n====== 开始上传生效文件。 ====== \n`);
+      await uploadLastFile(lastFile); // 上传生效文件
+    }
     
     console.log(`\n====== 全部文件上传成功(${files.length}个) ======`);
   } catch (error) {
@@ -141,8 +149,8 @@ function validateConfig(config, requiredKeys, type='') {
   }
 }
 
-// 如果用户输入 --help，显示命令使用说明
-if (argv.help) {
+// 提取的帮助信息函数
+function displayHelp() {
   console.log(`
     使用说明：
     --ossConfig        指定 OSS 配置文件路径。
@@ -157,5 +165,4 @@ if (argv.help) {
     --cosHeaders       指定自定义COS请求头信息（JSON格式）。
     --help             显示帮助信息。
   `);
-  process.exit(0);
 }
