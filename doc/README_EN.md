@@ -9,7 +9,6 @@
 ### Features
 
 *   **Multi-Cloud Support**: Supports OSS, COS, and allows users to dynamically choose single or multiple uploads.
-*   **Dynamic Configuration Loading**: Use the `customConfigPaths` parameter to configure uploads for other private or public clouds (expandable).
 *   **Easy to Extend**: Future support for more cloud storage options like AWS S3 and Google Cloud Storage.
 *   **Simplified Integration**: Unified API to streamline the file upload process.
 *   **Custom Headers**: Supports independent request header configuration for OSS and COS.
@@ -69,7 +68,6 @@ npm run uploader:tice
 *   `--maxRetryCount`: Maximum number of retry attempts (default is 5).
 *   `--concurrency`: Limit on the number of concurrent uploads (default is 10).
 *   `--headers`: Custom request headers (in JSON format).
-*   `--customConfigPaths`: Paths to custom configuration files (in JSON format array).
 *   `--ossHeaders`: OSS request headers (in JSON format).
 *   `--cosHeaders`: COS request headers (in JSON format).
 
@@ -93,112 +91,3 @@ To display help information, run:
 ```bash
 multi-cloud-uploader --help
 ```
-
-## Custom Configuration Loading with customConfigPaths
-
-You can dynamically load specific uploader configuration files (beyond OSS and COS) using the `customConfigPaths` parameter. This parameter should be a JSON array that can contain multiple configuration file paths.
-
-### Command-Line Example
-
-```bash
-multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination directory> --customConfigPaths='[<config file path1>, <config file path2>]' --ossConfig=<oss configuration file>
-```
-
-For example:
-
-```json
-"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./src/upload/ossUpload\"]' --ossConfig=./oss.tice.conf.json",
-```
-
-### Configuration Steps
-
-For OSS, follow these steps (example code can be found [here](https://github.com/SailingCoder/multi-cloud-uploader/tree/main/example/upload)):
-
-1. **Code Implementation**
-
-Create `./ossCopyUpload.js`:
-
-```js
-const OSS = require('ali-oss');
-const { BaseUploader, registerUploader } = require('multi-cloud-uploader');
-
-class UploadCopyOss extends BaseUploader {
-  constructor(options) {
-    super(options); // Call base class constructor
-    this.client = new OSS({
-      region: options.region,
-      accessKeyId: options.accessKeyId,
-      accessKeySecret: options.accessKeySecret,
-      bucket: options.bucket,
-    });
-    this.headers = options.headers || {}; // Optional
-  }
-
-  // Actual file upload function
-  async uploadSingleFile(file, targetPath) {
-    try {
-      const result = await this.client.put(targetPath, file, {
-        headers: this.headers, // Optional
-      });
-      return {
-        success: result?.res?.status === 200, // Required field
-        status: result?.res?.status, // Required field
-        // message: `File ${file} uploaded successfully to ${targetPath}`, // Optional
-        // extra: result,  // Optional
-      };
-    } catch (error) {
-      return {
-        success: false, // Required field
-        message: error.message, // Required field
-      };
-    }
-  }
-}
-
-// Register OSS uploader
-registerUploader(UploadCopyOss, {
-  configName: 'ossCopyConfig', // Configuration file name, required
-  configRequiredFields: ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], // Required
-  // headerName: 'ossCopyHeaders', // Header configuration, optional
-  type: 'ossCopy', // Uploader type, required
-});
-```
-
-2. **package.json Setup**
-
-Add to your scripts:
-
-```json
-"scripts": {
-  "uploaderossCopy:test": "multi-cloud-uploader --uploadFrom=src --uploadTo=sailing/test  --customConfigPaths='[\"./ossCopyUpload.js\"]' --ossCopyConfig=./config/oss.test.conf.json"
-}
-```
-
-3. **oss.test.conf.json Configuration**
-
-Create `./config/oss.test.conf.json`:
-
-```json
-{
-    "bucket": "your-bucket-name",
-    "accessKeyId": "your-access-key-id",
-    "accessKeySecret": "your-access-key-secret",
-    "region": "oss-cn-beijing"
-}
-```
-
-4. **Execute Command**
-
-Run:
-
-```bash
-npm run uploaderossCopy:test
-```
-
-## Communication
-
-For suggestions or issues, feel free to reach out via [issues](https://github.com/SailingCoder/multi-cloud-uploader/issues).
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
