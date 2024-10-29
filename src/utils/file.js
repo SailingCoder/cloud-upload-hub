@@ -37,4 +37,16 @@ function getUploadFiles(dir) {
     return [lastFile, otherFiles];
 }
 
-module.exports = { getUploadFiles, separatelastFile };
+function loadConfig(configPath) {
+    const cwd = process.cwd(); // 命令执行所在目录
+    let config = {};
+    configPath = path.resolve(cwd, configPath);
+    try {
+        config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    } catch (error) {
+        throw new Error(`${configPath} 配置文件加载失败: ${error.message}`); // 直接抛出错误
+    }
+    return config;
+}
+
+module.exports = { getUploadFiles, separatelastFile, loadConfig };
