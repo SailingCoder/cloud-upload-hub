@@ -1,0 +1,6 @@
+{
+    "bucket": "your-bucket-name",
+    "accessKeyId": "your-access-key-id",
+    "accessKeySecret": "your-access-key-secret",
+    "region": "oss-cn-beijing"
+}
