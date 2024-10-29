@@ -11,8 +11,8 @@ const uploadFrom = argv.uploadFrom;
 const uploadTo = argv.uploadTo;
 
 // 静态加载上传器（默认OSS、COS）
-// require("../src/upload/cosUpload.js");
-// require("../src/upload/ossUpload.js");
+require("../src/upload/cosUpload.js");
+require("../src/upload/ossUpload.js");
 
 // 动态加载上传器
 loadConfigFiles();
