@@ -8,3 +8,5 @@ node_modules
 example
 doc
 babel.config.js
+cos.tice.conf.json
+oss.tice.conf.json
