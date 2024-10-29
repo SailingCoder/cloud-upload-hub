@@ -23,5 +23,5 @@ yarn-error.log*
 /nbproject/private/
 /cicd
 .DS_Store
-# cos.tice.conf.json
-# oss.tice.conf.json
+cos.tice.conf.json
+oss.tice.conf.json
