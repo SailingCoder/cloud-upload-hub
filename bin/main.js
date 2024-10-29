@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const minimist = require("minimist");
-const { getUploadFiles, separatelastFile } = require("../src/utils/file")
+const { getUploadFiles, separatelastFile, resolveConfigPath } = require("../src/utils/file")
 const { registerUploader, uploaders } = require('../src/upload/uploaderRegistry');
 const { BaseUploader } = require('../src/upload/baseUploader');
 
@@ -10,14 +10,40 @@ const lastFileName = argv.lastFile || "index.html"; // 默认最后上传的文�
 const uploadFrom = argv.uploadFrom;
 const uploadTo = argv.uploadTo;
 
-// 加载上传器
-require("../src/upload/cosUpload.js");
-require("../src/upload/ossUpload.js");
+// 静态加载上传器（默认OSS、COS）
+// require("../src/upload/cosUpload.js");
+// require("../src/upload/ossUpload.js");
+
+// 动态加载上传器
+loadConfigFiles();
 
 // 如果用户输入 --help，显示命令使用说明
 if (argv.help) {
   displayHelp();
   process.exit(0);
+}
+
+function loadConfigFiles() {
+  try {
+    const cpaths = (() => {
+      try {
+        return JSON.parse(argv?.customConfigPaths || '[]');
+      } catch (error) {
+        console.error("无效的 JSON 格式 in customConfigPaths:", error);
+        return [];
+      }
+    })();
+
+    if (Array.isArray(cpaths) && cpaths.length > 0) {
+      cpaths.forEach(cpath => {
+        const absolutePath = resolveConfigPath(cpath);
+        require(absolutePath);
+      });
+    }
+  } catch (error) {
+    console.error("加载配置文件失败:", error);
+    process.exit(1);
+  }
 }
 
 async function runUpload() {
@@ -78,7 +104,15 @@ runUpload();
 // 提取的帮助信息函数
 function displayHelp() {
   console.log(`
-    使用说明：
+    multi-cloud-uploader 本地上传工具，支持 OSS、COS 上传。
+    
+    稳定版本：
+    multi-cloud-uploader@1.0.3
+    
+    使用方法：
+    multi-cloud-uploader --uploadFrom=<源目录> --uploadTo=<目标目录> --ossConfig=<oss配置文件> --cosConfig=<cos配置文件>
+    
+    参数说明：
     --ossConfig        指定 OSS 配置文件路径。
     --cosConfig        指定 COS 配置文件路径。
     --uploadFrom       指定上传源文件夹路径。
@@ -87,6 +121,7 @@ function displayHelp() {
     --concurrency      指定并发上传的数量限制（默认为10）。
     --lastFile         最后一个上传的文件（默认为 index.html）。
     --headers          指定自定义请求头信息（JSON格式）。
+    --customConfigPaths 自定义配置文件路径（JSON格式数组）。
     --ossHeaders       指定自定义OSS请求头信息（JSON格式）。
     --cosHeaders       指定自定义COS请求头信息（JSON格式）。
     --help             显示帮助信息。

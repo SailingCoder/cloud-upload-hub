@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "uploaderOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --ossConfig=./oss.tice.conf.json",
     "uploaderCOS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./cos.tice.conf.json",
+    "uploaderRegistry:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./src/upload/ossUpload\", \"./src/upload/cosUpload\"]' --ossConfig=./oss.tice.conf.json --cosConfig=./cos.tice.conf.json",
     "uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./cos.tice.conf.json --ossConfig=./oss.tice.conf.json"
   },
   "keywords": [

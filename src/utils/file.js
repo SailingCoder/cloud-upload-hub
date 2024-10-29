@@ -38,9 +38,8 @@ function getUploadFiles(dir) {
 }
 
 function loadConfig(configPath) {
-    const cwd = process.cwd(); // 命令执行所在目录
     let config = {};
-    configPath = path.resolve(cwd, configPath);
+    configPath = resolveConfigPath(configPath);
     try {
         config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
     } catch (error) {
@@ -49,4 +48,9 @@ function loadConfig(configPath) {
     return config;
 }
 
-module.exports = { getUploadFiles, separatelastFile, loadConfig };
+function resolveConfigPath(relativePath) {
+    const cwd = process.cwd(); // 获取当前工作目录
+    return path.resolve(cwd, relativePath); // 将相对路径解析为绝对路径
+}
+
+module.exports = { getUploadFiles, separatelastFile, loadConfig, resolveConfigPath };

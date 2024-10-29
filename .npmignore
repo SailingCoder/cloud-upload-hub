@@ -3,3 +3,8 @@ node_modules
 .vscode
 **/*.test.ts
 .history
+.gitignore
+.npmignore
+example
+doc
+babel.config.js

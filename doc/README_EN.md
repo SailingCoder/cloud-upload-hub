@@ -1,101 +1,81 @@
-# multi-cloud-uploader Documentation
+# multi-cloud-uploader - Lightweight Frontend Multi-Cloud Upload Library
 
-**multi-cloud-uploader** is a lightweight file upload library designed for front-end resource uploads to multiple cloud storage platforms. This simple command-line tool is tailored for uploading files to multi-cloud environments and currently supports Alibaba Cloud OSS and Tencent Cloud COS. Future updates will expand support to other cloud providers. By using a streamlined API, developers can easily integrate file upload capabilities across multiple cloud platforms without needing to implement custom logic for each one. The tool supports uploading from local directories and allows delayed uploads for specified files upon completion.
+**multi-cloud-uploader** is a lightweight Node library designed for uploading files to multiple cloud storage platforms. Currently, it supports Alibaba Cloud OSS and Tencent Cloud COS, with plans to extend support to more cloud storage services in the future. This library aims to simplify the integration of file upload functionality across different cloud platforms, allowing developers to avoid redundant implementations for each service.
 
 ![npm version](https://img.shields.io/npm/v/multi-cloud-uploader)
 
-[中文文档](https://github.com/SailingCoder/multi-cloud-uploader/blob/main/README.md)
+[Chinese Documentation](https://github.com/SailingCoder/multi-cloud-uploader/blob/main/doc/README_CN.md)
 
-## Features
-- **Multi-Cloud Support**: Initial support for Alibaba Cloud OSS and Tencent Cloud COS with planned expansion to other services.
-- **Easy Extensibility**: Future updates will support AWS S3, Google Cloud Storage, and more.
-- **Simplified Integration**: A unified interface streamlines file uploads across platforms.
-- **Customizable Headers**: Configure request headers for OSS and COS independently.
-- **Final File Upload Option**: Allows specifying the last file to upload (default is `index.html`).
-- **Retry Mechanism**: Automatic retry ensures reliable file upload.
+### Features
+
+*   **Multi-Cloud Support**: Supports OSS, COS, and allows users to dynamically choose single or multiple uploads.
+*   **Dynamic Configuration Loading**: Use the `customConfigPaths` parameter to configure uploads for other private or public clouds (expandable).
+*   **Easy to Extend**: Future support for more cloud storage options like AWS S3 and Google Cloud Storage.
+*   **Simplified Integration**: Unified API to streamline the file upload process.
+*   **Custom Headers**: Supports independent request header configuration for OSS and COS.
+*   **Last File Upload Specification**: Default support for `index.html`.
+*   **Retry Mechanism**: Automatic retries for uploads to ensure reliability.
 
 ## Installation
 
-Install the tool via npm in your project:
+Install the library via npm:
 
 ```bash
-npm install multi-cloud-uploader --save-dev
+npm install multi-cloud-uploader --save-dev 
 ```
 
 ## Usage
 
-To use the tool from the command line, run:
+### Command-Line Example
+
+To use multi-cloud-uploader, run the following command in the terminal:
 
 ```bash
-multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/test --ossConfig=./oss.test.conf.json
+multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination directory> --ossConfig=<oss configuration file>
 ```
 
-Or configure it within `package.json`:
+### Example
+
+To upload files to a test directory:
+
+```bash
+multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/test --ossConfig=./oss.test.conf.json 
+```
+
+In your package.json, you can configure scripts as follows:
 
 ```json
 "scripts": {
-  "uploader:tice": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/tice --ossConfig=./oss.tice.conf.json",
-  "uploader:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/test --ossConfig=./oss.test.conf.json",
-  "uploader:gray": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/gray --ossConfig=./oss.gray.conf.json",
-  "uploader:prod": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/prod --ossConfig=./oss.prod.conf.json"
+  "uploader:tice": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/tice --ossConfig=./config/oss.tice.conf.json",
+  "uploader:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/test --ossConfig=./config/oss.test.conf.json",
+  "uploader:gray": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/gray --ossConfig=./config/oss.gray.conf.json",
+  "uploader:prod": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/prod --ossConfig=./config/oss.prod.conf.json"
 }
 ```
 
-Set the `uploadFrom` source, `uploadTo` target directory, and `ossConfig` or `cosConfig` with credentials. Run the upload script:
+Execute a command with:
 
 ```bash
 npm run uploader:tice
 ```
 
-Example output:
+### Parameter Explanation
 
-```json
-====== Scanned 7 files. Starting upload. ======
+*   `--ossConfig`: Path to the Alibaba Cloud OSS configuration file (in JSON format), must include `bucket`, `accessKeyId`, `accessKeySecret`, and `region`.
+*   `--cosConfig`: Path to the Tencent Cloud COS configuration file (in JSON format), must include `Bucket`, `SecretId`, `SecretKey`, and `Region`.
+*   `--uploadFrom`: Specify the local directory or file path to upload.
+*   `--uploadTo`: Target path in OSS or COS.
+*   `--lastFile`: The last file to upload (default is `index.html`).
+*   `--maxRetryCount`: Maximum number of retry attempts (default is 5).
+*   `--concurrency`: Limit on the number of concurrent uploads (default is 10).
+*   `--headers`: Custom request headers (in JSON format).
+*   `--customConfigPaths`: Paths to custom configuration files (in JSON format array).
+*   `--ossHeaders`: OSS request headers (in JSON format).
+*   `--cosHeaders`: COS request headers (in JSON format).
 
-[OSS][SUCCESS][1/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
-[OSS][SUCCESS][2/7]: src/main.js -> test/sailing/src/main.js
-[OSS][SUCCESS][3/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
-[OSS][SUCCESS][4/7]: src/utils/file.js -> test/sailing/src/utils/file.js
-[OSS][SUCCESS][5/7]: src/.DS_Store -> test/sailing/src/.DS_Store
-[OSS][SUCCESS][6/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
+### Configuration File Example
 
-====== Uploading final file. ====== 
-
-[OSS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
-
-====== Upload complete (7 files). ======
-```
-
-## Parameters
-
-- `--ossConfig`: Path to the OSS configuration file in JSON format, containing `bucket`, `accessKeyId`, `accessKeySecret`, and `region`.
-- `--cosConfig`: Path to the COS configuration file in JSON format, containing `Bucket`, `SecretId`, `SecretKey`, and `Region`.
-- `--uploadFrom`: Local directory or file path for upload.
-- `--uploadTo`: Target path on OSS or COS for storing files.
-- `--lastFile`: Specifies the last file to upload, typically an entry file (default `index.html`).
-- `--maxRetryCount`: Maximum retry attempts (default is 5).
-- `--concurrency`: Limits concurrent uploads (default is 10).
-- `--headers`: Custom request headers (JSON format).
-- `--ossHeaders`: Custom OSS-specific headers (JSON format).
-- `--cosHeaders`: Custom COS-specific headers (JSON format).
-
-## Help
-
-To display help information:
-
-```bash
-multi-cloud-uploader --help
-```
-
-## Example Configuration Files
-
-### Usage Example:
-
-```bash
-multi-cloud-uploader --uploadFrom=path/to/uploadFrom --uploadTo=path/to/uploadTo --headers='{"x-my-header":"my-value"}' --ossConfig=config/ossConfig.json --cosConfig=config/cosConfig.json
-```
-
-### Alibaba Cloud OSS Configuration (ossConfig.json)
+For an Alibaba Cloud OSS configuration (ossConfig.json):
 
 ```json
 {
@@ -106,16 +86,118 @@ multi-cloud-uploader --uploadFrom=path/to/uploadFrom --uploadTo=path/to/uploadTo
 }
 ```
 
-### Tencent Cloud COS Configuration (cosConfig.json)
+### Show Help Information
+
+To display help information, run:
+
+```bash
+multi-cloud-uploader --help
+```
+
+## Custom Configuration Loading with customConfigPaths
+
+You can dynamically load specific uploader configuration files (beyond OSS and COS) using the `customConfigPaths` parameter. This parameter should be a JSON array that can contain multiple configuration file paths.
+
+### Command-Line Example
+
+```bash
+multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination directory> --customConfigPaths='[<config file path1>, <config file path2>]' --ossConfig=<oss configuration file>
+```
+
+For example:
+
+```json
+"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./src/upload/ossUpload\"]' --ossConfig=./oss.tice.conf.json",
+```
+
+### Configuration Steps
+
+For OSS, follow these steps (example code can be found [here](https://github.com/SailingCoder/multi-cloud-uploader/tree/main/example/upload)):
+
+1. **Code Implementation**
+
+Create `./ossCopyUpload.js`:
+
+```js
+const OSS = require('ali-oss');
+const { BaseUploader, registerUploader } = require('multi-cloud-uploader');
+
+class UploadCopyOss extends BaseUploader {
+  constructor(options) {
+    super(options); // Call base class constructor
+    this.client = new OSS({
+      region: options.region,
+      accessKeyId: options.accessKeyId,
+      accessKeySecret: options.accessKeySecret,
+      bucket: options.bucket,
+    });
+    this.headers = options.headers || {}; // Optional
+  }
+
+  // Actual file upload function
+  async uploadSingleFile(file, targetPath) {
+    try {
+      const result = await this.client.put(targetPath, file, {
+        headers: this.headers, // Optional
+      });
+      return {
+        success: result?.res?.status === 200, // Required field
+        status: result?.res?.status, // Required field
+        // message: `File ${file} uploaded successfully to ${targetPath}`, // Optional
+        // extra: result,  // Optional
+      };
+    } catch (error) {
+      return {
+        success: false, // Required field
+        message: error.message, // Required field
+      };
+    }
+  }
+}
+
+// Register OSS uploader
+registerUploader(UploadCopyOss, {
+  configName: 'ossCopyConfig', // Configuration file name, required
+  configRequiredFields: ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], // Required
+  // headerName: 'ossCopyHeaders', // Header configuration, optional
+  type: 'ossCopy', // Uploader type, required
+});
+```
+
+2. **package.json Setup**
+
+Add to your scripts:
+
+```json
+"scripts": {
+  "uploaderossCopy:test": "multi-cloud-uploader --uploadFrom=src --uploadTo=sailing/test  --customConfigPaths='[\"./ossCopyUpload.js\"]' --ossCopyConfig=./config/oss.test.conf.json"
+}
+```
+
+3. **oss.test.conf.json Configuration**
+
+Create `./config/oss.test.conf.json`:
 
 ```json
 {
-  "Bucket": "your-bucket-name",
-  "SecretId": "your-secret-id",
-  "SecretKey": "your-secret-key",
-  "Region": "ap-beijing"
+    "bucket": "your-bucket-name",
+    "accessKeyId": "your-access-key-id",
+    "accessKeySecret": "your-access-key-secret",
+    "region": "oss-cn-beijing"
 }
 ```
+
+4. **Execute Command**
+
+Run:
+
+```bash
+npm run uploaderossCopy:test
+```
+
+## Communication
+
+For suggestions or issues, feel free to reach out via [issues](https://github.com/SailingCoder/multi-cloud-uploader/issues).
 
 ## License
 
