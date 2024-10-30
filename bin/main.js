@@ -72,9 +72,9 @@ async function runUpload() {
       await uploadLastFile(lastFile); // 上传生效文件
     }
     
-    console.log(`\n====== 文件上传完成 ======`);
+    console.log(`====== 文件上传完成 ======`);
   } catch (error) {
-    // console.error("上传过程中发生错误:", error);
+    console.error("上传过程中发生错误:", error.message);
   }
 }
 
@@ -93,8 +93,9 @@ async function uploadLastFile(lastFile) {
   try {
     const lastFileUploadPromises = uploaders.map(uploader => uploader.uploadSingleFileWithRetry(lastFile));
     await Promise.all(lastFileUploadPromises);
+    console.log("");
   } catch (error) {
-    console.error("最后一个生效文件上传失败:", error);
+    console.error("最后一个生效文件上传失败:", error.message);
   }
 }
 
