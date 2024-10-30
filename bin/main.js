@@ -107,7 +107,7 @@ function displayHelp() {
     multi-cloud-uploader 本地上传工具，支持 OSS、COS 上传。
     
     稳定版本：
-    multi-cloud-uploader@1.0.3
+    multi-cloud-uploader@1.0.5
     
     使用方法：
     multi-cloud-uploader --uploadFrom=<源目录> --uploadTo=<目标目录> --ossConfig=<oss配置文件> --cosConfig=<cos配置文件>
