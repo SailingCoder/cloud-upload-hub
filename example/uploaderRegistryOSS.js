@@ -2,7 +2,7 @@
 // 然后在命令行执行, 即可上传文件到阿里云 OSS
 /*
 "scripts": {
-  "uploaderossCopy:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=sailing/test  --customConfigPaths='[\"./ossCopyUpload.js\"]' --ossCopyConfig=./config/oss.test.conf.json",
+  "uploaderRegistryOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
 },
 */
 const OSS = require('ali-oss')
