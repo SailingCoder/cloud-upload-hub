@@ -107,12 +107,12 @@ multi-cloud-uploader --uploadFrom=<源目录> --uploadTo=<目标目录> --custom
 例如：
 
 ```bash
-"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./src/upload/ossUpload\"]' --ossConfig=./oss.tice.conf.json",
+"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./upload/ossUpload.js\"]' --ossConfig=./oss.tice.conf.json",
 ```
 
 ### 配置步骤
 
-以 OSS 为例，代码示例：（代码就按照这个复制、粘贴，改改）[代码示例](https://github.com/SailingCoder/multi-cloud-uploader/tree/main/example/upload)
+以 OSS 为例，代码示例：（代码就按照这个复制、粘贴，改改）[代码示例](https://github.com/SailingCoder/multi-cloud-uploader/tree/main/example)
 
 1、代码编写
 

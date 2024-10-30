@@ -109,7 +109,7 @@ multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination dir
 For example:
 
 ```json
-"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./src/upload/ossUpload\"]' --ossConfig=./oss.tice.conf.json",
+"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./upload/ossUpload.js\"]' --ossConfig=./oss.tice.conf.json",
 ```
 
 ### Configuration Steps
