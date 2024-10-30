@@ -6,7 +6,7 @@ node_modules
 .gitignore
 .npmignore
 doc
-babel.config.js
+babel.config.json
 cos.tice.conf.json
 oss.tice.conf.json
 config
