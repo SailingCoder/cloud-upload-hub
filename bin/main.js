@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const minimist = require("minimist");
-const { getUploadFiles, separatelastFile, resolveConfigPath } = require("../src/utils/file")
+const { getUploadFiles, separatelastFile, resolveConfigPath, displayHelp } = require("../src/utils/file")
 const { uploaders } = require('../src/upload/uploaderRegistry');
 
 const argv = minimist(process.argv.slice(2)); // 获取并解析传过来的参数
@@ -101,29 +101,3 @@ async function uploadLastFile(lastFile) {
 
 runUpload();
 
-// 提取的帮助信息函数
-function displayHelp() {
-  console.log(`
-    multi-cloud-uploader 本地上传工具，支持 OSS、COS 上传。
-    
-    稳定版本：
-    multi-cloud-uploader@1.0.5
-    
-    使用方法：
-    multi-cloud-uploader --uploadFrom=<源目录> --uploadTo=<目标目录> --ossConfig=<oss配置文件> --cosConfig=<cos配置文件>
-    
-    参数说明：
-    --ossConfig        指定 OSS 配置文件路径。
-    --cosConfig        指定 COS 配置文件路径。
-    --uploadFrom       指定上传源文件夹路径。
-    --uploadTo         指定上传目标路径。
-    --maxRetryCount    指定最大重试次数（默认为5）。
-    --concurrency      指定并发上传的数量限制（默认为10）。
-    --lastFile         最后一个上传的文件（默认为 index.html）。
-    --headers          指定自定义请求头信息（JSON格式）。
-    --customConfigPaths 自定义配置文件路径（JSON格式数组）。
-    --ossHeaders       指定自定义OSS请求头信息（JSON格式）。
-    --cosHeaders       指定自定义COS请求头信息（JSON格式）。
-    --help             显示帮助信息。
-  `);
-}

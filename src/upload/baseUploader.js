@@ -24,7 +24,7 @@ class BaseUploader {
   // 上传单个文件，并增加重试机制
   async uploadSingleFileWithRetry(file, retryCount = 0) {
     try {
-      const targetPath = path.join(this.uploadTo, file);
+      const targetPath = path.join(this.uploadTo, path.relative(this.uploadFrom, file));
       const result = await this.uploadSingleFile(file, targetPath);
       if (result?.success) {
         this.successTotal++;

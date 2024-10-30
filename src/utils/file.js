@@ -53,4 +53,38 @@ function resolveConfigPath(relativePath) {
     return path.resolve(cwd, relativePath); // 将相对路径解析为绝对路径
 }
 
-module.exports = { getUploadFiles, separatelastFile, loadConfig, resolveConfigPath };
+// 提取的帮助信息函数
+function displayHelp() {
+    // 读取 package.json 文件
+    const packageJsonPath = path.join(__dirname, '../../package.json'); // 根据实际路径调整
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+    // 获取稳定版本号
+    const stableVersion = packageJson.version;
+
+    console.log(`
+      multi-cloud-uploader 本地上传工具，支持 OSS、COS 上传。
+      
+      稳定版本：
+      multi-cloud-uploader@${stableVersion}
+      
+      使用方法：
+      multi-cloud-uploader --uploadFrom=<源目录> --uploadTo=<目标目录> --ossConfig=<oss配置文件> --cosConfig=<cos配置文件>
+      
+      参数说明：
+      --ossConfig          指定 OSS 配置文件路径。
+      --cosConfig          指定 COS 配置文件路径。
+      --uploadFrom         指定上传源文件夹路径。
+      --uploadTo           指定上传目标路径。
+      --maxRetryCount      指定最大重试次数（默认为5）。
+      --concurrency        指定并发上传的数量限制（默认为10）。
+      --lastFile           最后一个上传的文件（默认为 index.html）。
+      --headers            指定自定义请求头信息（JSON格式）。
+      --customConfigPaths  自定义配置文件路径（JSON格式数组）。
+      --ossHeaders         指定自定义OSS请求头信息（JSON格式）。
+      --cosHeaders         指定自定义COS请求头信息（JSON格式）。
+      --help               显示帮助信息。
+    `);
+}
+
+module.exports = { getUploadFiles, separatelastFile, loadConfig, resolveConfigPath, displayHelp };displayHelp

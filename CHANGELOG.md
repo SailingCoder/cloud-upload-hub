@@ -11,3 +11,8 @@
 # 1.0.5(2024-10-30)
 ## features
 + Log update。
+
+# 1.0.5(2024-10-30)
+## features
+- 修复了在上传时意外包含源目录文件夹的问题，确保上传的文件结构符合预期。
+- 例如，之前的上传路径 `test/sailing/src/index.js` 现在更新为 `test/sailing/index.js`。
