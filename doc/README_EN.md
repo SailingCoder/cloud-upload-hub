@@ -1,6 +1,8 @@
 # multi-cloud-uploader - Lightweight Frontend Multi-Cloud Upload Library
 
-**multi-cloud-uploader** is a lightweight Node library designed for uploading files to multiple cloud storage platforms. Currently, it supports Alibaba Cloud OSS and Tencent Cloud COS, with plans to extend support to more cloud storage services in the future. This library aims to simplify the integration of file upload functionality across different cloud platforms, allowing developers to avoid redundant implementations for each service.
+**multi-cloud-uploader** is a lightweight Node library designed for uploading files to multiple cloud storage platforms. Currently, it supports Alibaba Cloud OSS and Tencent Cloud COS, with plans to extend support to more cloud storage services in the future.
+
+This library aims to simplify the integration of file upload functionality across different cloud platforms, allowing developers to avoid redundant implementations for each service.
 
 ![npm version](https://img.shields.io/npm/v/multi-cloud-uploader)
 
