@@ -5,8 +5,8 @@ node_modules
 .history
 .gitignore
 .npmignore
-example
 doc
 babel.config.js
 cos.tice.conf.json
 oss.tice.conf.json
+config
