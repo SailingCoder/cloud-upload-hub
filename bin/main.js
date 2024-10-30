@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 const minimist = require("minimist");
 const { getUploadFiles, separatelastFile, resolveConfigPath } = require("../src/utils/file")
-const { registerUploader, uploaders } = require('../src/upload/uploaderRegistry');
-const { BaseUploader } = require('../src/upload/baseUploader');
+const { uploaders } = require('../src/upload/uploaderRegistry');
 
 const argv = minimist(process.argv.slice(2)); // 获取并解析传过来的参数
 
@@ -127,5 +126,3 @@ function displayHelp() {
     --help             显示帮助信息。
   `);
 }
-
-module.exports = { registerUploader, BaseUploader };
