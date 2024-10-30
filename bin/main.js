@@ -72,9 +72,9 @@ async function runUpload() {
       await uploadLastFile(lastFile); // 上传生效文件
     }
     
-    console.log(`\n====== 全部文件上传成功(${files.length}个) ======`);
+    console.log(`\n====== 文件上传完成 ======`);
   } catch (error) {
-    console.error("[error]: 上传过程中发生错误:", error);
+    // console.error("上传过程中发生错误:", error);
   }
 }
 

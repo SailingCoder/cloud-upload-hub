@@ -29,17 +29,24 @@ class BaseUploader {
       if (result?.success) {
         this.successTotal++;
         const msg = result?.message ? result?.message : `${file} -> ${targetPath}`;
-        console.log(`[${this.type}][SUCCESS][${this.successTotal}/${this.fileTotal}]${retryCount ? `(${retryCount + 1})`: ''}: ${msg}`)
+        console.log(`[${this.type}][OK][${this.successTotal}/${this.fileTotal}][${new Date().toISOString()}]${retryCount ? `(${retryCount + 1})`: ''}: ${msg}`)
       } else {
-        throw new Error(`status：${result?.status}${result?.message ? `, message：${result.message}` : ''}`);
+        const messages = [];
+        if (result?.status) {
+          messages.push(`status: ${result.status}`);
+        }
+        if (result?.message) {
+          messages.push(`${result.message}`);
+        }
+        throw new Error(messages.length > 0 ? messages.join(', ') : '未知错误');
       }
     } catch (error) {
       if (retryCount < this.maxRetryCount) {
-        console.warn(`[${this.type}][WARN]: 上传异常，正在重试上传，重试次数：${retryCount + 1}，文件: ${file}`);
+        console.warn(`[${this.type}][WARN][${new Date().toISOString()}]: 上传异常，正在重试 #${retryCount + 1}，文件: ${file}`);
         // console.warn(`[OSS][WARN]: 上传 OSS 异常，正在重试 ${file}，重试次数：${retryCount + 1}`);
         await this.uploadSingleFileWithRetry(file, retryCount + 1);
       } else {
-        console.error(`[${this.type}][ERROR]: 上传失败，文件: ${file}，errorMsg：`, error.message);
+        console.error(`[${this.type}][ERROR][${new Date().toISOString()}]: 上传失败，文件: ${file}, message：${error.message}`);
         throw error;
       }
     }
