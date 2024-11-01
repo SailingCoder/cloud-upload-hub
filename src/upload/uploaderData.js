@@ -6,7 +6,7 @@ async function runUpload() {
     const configData = getConfigData()
     try {
         if (!configData.source || !configData.target) {
-            console.error("请提供【uploadFrom】和【uploadTo】参数进行上传。");
+            console.error("请提供【source】和【target】参数进行上传。");
             process.exit(1);
         }
 
@@ -39,8 +39,8 @@ async function runUpload() {
         console.log(`====== 文件上传完成 ======`);
     } catch (error) {
         console.error("上传过程中发生错误:", error.message);
-        if (configData.onFail && typeof configData.onFail === "function") {
-            configData.onFail(error.message);
+        if (configData.onUploadFail && typeof configData.onUploadFail === "function") {
+            configData.onUploadFail(error.message);
         }
     }
 }
@@ -70,8 +70,8 @@ async function uploadLastFile(lastFile) {
     } catch (error) {
         // console.error("最后一个生效文件上传失败:", error.message);
         const config = getConfigData();
-        if (config.onFail && typeof config.onFail === "function") {
-            config.onFail(error.message);
+        if (config.onUploadFail && typeof config.onUploadFail === "function") {
+            config.onUploadFail(error.message);
         }
     }
 }
