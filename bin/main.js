@@ -13,12 +13,8 @@ if (getArgv().help) {
 run()
 
 function run() {
-  try {
-    runLoadConfig(); // 加载配置
-    runUpload(); // 执行上传
-  } catch (error) {
-    // console.log("上传过程中发生错误:", error.message);
-  }
+  runLoadConfig(); // 加载配置
+  runUpload(); // 执行上传
 }
 
 // 加载配置文件
@@ -34,7 +30,10 @@ function runLoadConfig() {
     // 动态加载上传器
     loadUploadModules(configData.uploaderModules);
   } catch (error) {
-    console.error("加载配置文件失败:", error);
+    console.error("【error】加载配置文件:", error.message);
+    if (config.onUploadFail && typeof config.onUploadFail === "function") {
+      config.onUploadFail(4, error.message);
+    }
     process.exit(1);
   }
 }
@@ -50,7 +49,6 @@ async function loadUploadModules(paths = []) {
       }
     }
   } catch (error) {
-    console.error("加载上传器配置文件失败:", error);
-    process.exit(1);
+    throw new Error(`加载上传器配置文件失败, ${error.message}`);
   }
 }

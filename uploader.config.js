@@ -17,6 +17,7 @@ const defineConfig = ({ mode }) => {
     maxConcurrent: 10,  // 最大并发量
     lastFile: 'index.html',  // 最后一个文件
     ossCredentials: './config/oss.tice.conf.json',  // 该路径包含 OSS 的具体配置文件
+    cosCredentials: './config/cos.tice.conf.json',
     // cosCredentials: async () => ({
     //   SecretId: 'xxx',  // COS的秘密ID
     //   SecretKey: 'xxx'  // COS的秘密密钥

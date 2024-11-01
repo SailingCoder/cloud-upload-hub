@@ -25,7 +25,7 @@ async function runUpload() {
         }
         [lastFile, otherFiles] = separatelastFile(
             files,
-            configData.lastFileName
+            configData.lastFile
         );    
     } catch (error) {
         console.error("【error】资源上传前", error.message);
@@ -42,7 +42,7 @@ async function runUpload() {
         console.log(`====== 开始上传生效文件。 ====== \n`);
         await uploadLastFile(lastFile);
     }
-    
+
     console.log(`====== 文件上传完成 ======`);
     if (configData.onSuccess && typeof configData.onSuccess === "function") {
         configData.onSuccess();
@@ -54,10 +54,10 @@ async function uploadFiles(otherFiles, files) {
     try {
         for (const uploader of uploaders) {
             const uploaderName = uploader.getUploaderType();
-            console.log(`开始上传 ${uploaderName} 资源文件... \n`);
+            console.log(`${uploaderName}资源文件，开始上传...\n`);
             await uploader.setFileTotal(files.length);
             await uploader.uploadFile(otherFiles);
-            console.log(`${uploaderName} 资源上传完成 \n`);
+            console.log(`\n${uploaderName}资源文件，上传完成。\n`);
         }
     } catch (error) {
         console.error("【error】资源文件上传过程中:", error.message);
@@ -74,13 +74,17 @@ async function uploadLastFile(lastFile) {
         return;
     }
     try {
-        const lastFileUploadPromises = uploaders.map((uploader) => {
-            console.log(`开始上传 ${uploader.getUploaderType()} 生效文件... \n`);
-            uploader.uploadSingleFileWithRetry(lastFile)
-            console.log(`${uploader.getUploaderType()} 生效文件上传完成 \n`);
-        });
-        await Promise.all(lastFileUploadPromises);
-        console.log("");
+        // const lastFileUploadPromises = uploaders.map((uploader) => {
+        //     console.log(`开始上传 ${uploader.getUploaderType()} 生效文件... \n`);
+        //     uploader.uploadSingleFileWithRetry(lastFile)
+        //     console.log(`${uploader.getUploaderType()} 生效文件上传完成 \n`);
+        // });
+        // await Promise.all(lastFileUploadPromises);
+        for (const uploader of uploaders) {
+            console.log(`${uploader.getUploaderType()}生效文件，开始上传...\n`);
+            await uploader.uploadSingleFileWithRetry(lastFile);
+            console.log(`\n${uploader.getUploaderType()}生效文件，上传完成。\n`);
+        }
     } catch (error) {
         console.error("【error】资源上传生效文件:", error.message);
         const config = getConfigData();
