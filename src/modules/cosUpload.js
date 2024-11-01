@@ -1,7 +1,7 @@
 const COS = require("cos-nodejs-sdk-v5");
 const fs = require("fs");
-const { BaseUploader } = require('./baseUploader')
-const { registerUploader } = require('./uploaderRegistry')
+const { BaseUploader } = require('../upload/baseUploader')
+const { registerUploader } = require('../upload/uploaderRegistry')
 
 class UploadCos extends BaseUploader {
   constructor(options) {
@@ -15,19 +15,19 @@ class UploadCos extends BaseUploader {
     this.headers = options.headers || {};
   }
 
-  async uploadSingleFile(file, targetPath) {
+  async uploadSingleFile(file, target) {
     try {
       const result = await this.client.putObject({
         Bucket: this.Bucket,
         Region: this.Region,
-        Key: targetPath,
+        Key: target,
         Body: fs.createReadStream(file),
         Headers: this.headers,
       });
       return {
         success: result.statusCode === 200,
         status: result.statusCode,
-        // message: `文件 ${file} 上传成功到 ${targetPath}`, 默认: `${file} -> ${targetPath}`
+        // message: `文件 ${file} 上传成功到 ${target}`, 默认: `${file} -> ${target}`
         extra: result,
       };
     } catch (error) {
@@ -41,7 +41,7 @@ class UploadCos extends BaseUploader {
 
 // 设置 COS 上传器
 registerUploader(UploadCos, {
-  configName: 'cosConfig', // 配置文件名
+  configName: 'cosCredentials', // 配置文件名
   configRequiredFields: ['Bucket', 'SecretKey', 'SecretId', 'Region'], // 必填字段
   headerName: 'cosHeaders', // 头部配置
   type: 'COS', // 上传器类型

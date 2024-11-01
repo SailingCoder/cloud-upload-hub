@@ -11,7 +11,7 @@ This library aims to simplify the integration of file upload functionality acros
 ### Features
 
 *   **Multi-Cloud Support**: Supports OSS, COS, and allows users to dynamically choose single or multiple uploads.
-*   **Dynamic Configuration Loading**: Use the `customConfigPaths` parameter to configure uploads for other private or public clouds (expandable).
+*   **Dynamic Configuration Loading**: Use the `uploaderModules` parameter to configure uploads for other private or public clouds (expandable).
 *   **Easy to Extend**: Future support for more cloud storage options like AWS S3 and Google Cloud Storage.
 *   **Simplified Integration**: Unified API to streamline the file upload process.
 *   **Custom Headers**: Supports independent request header configuration for OSS and COS.
@@ -33,7 +33,7 @@ npm install multi-cloud-uploader --save-dev
 To use multi-cloud-uploader, run the following command in the terminal:
 
 ```bash
-multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination directory> --ossConfig=<oss configuration file>
+multi-cloud-uploader --source=<source directory> --target=<destination directory> --ossCredentials=<oss configuration file>
 ```
 
 ### Example
@@ -41,17 +41,17 @@ multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination dir
 To upload files to a test directory:
 
 ```bash
-multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/test --ossConfig=./oss.test.conf.json 
+multi-cloud-uploader --source=dist --target=projectName/test --ossCredentials=./oss.test.conf.json 
 ```
 
 In your package.json, you can configure scripts as follows:
 
 ```json
 "scripts": {
-  "uploader:tice": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/tice --ossConfig=./config/oss.tice.conf.json",
-  "uploader:test": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/test --ossConfig=./config/oss.test.conf.json",
-  "uploader:gray": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/gray --ossConfig=./config/oss.gray.conf.json",
-  "uploader:prod": "multi-cloud-uploader --uploadFrom=dist --uploadTo=projectName/prod --ossConfig=./config/oss.prod.conf.json"
+  "uploader:tice": "multi-cloud-uploader --source=dist --target=projectName/tice --ossCredentials=./config/oss.tice.conf.json",
+  "uploader:test": "multi-cloud-uploader --source=dist --target=projectName/test --ossCredentials=./config/oss.test.conf.json",
+  "uploader:gray": "multi-cloud-uploader --source=dist --target=projectName/gray --ossCredentials=./config/oss.gray.conf.json",
+  "uploader:prod": "multi-cloud-uploader --source=dist --target=projectName/prod --ossCredentials=./config/oss.prod.conf.json"
 }
 ```
 
@@ -63,21 +63,21 @@ npm run uploader:tice
 
 ### Parameter Explanation
 
-*   `--ossConfig`: Path to the Alibaba Cloud OSS configuration file (in JSON format), must include `bucket`, `accessKeyId`, `accessKeySecret`, and `region`.
-*   `--cosConfig`: Path to the Tencent Cloud COS configuration file (in JSON format), must include `Bucket`, `SecretId`, `SecretKey`, and `Region`.
-*   `--uploadFrom`: Specify the local directory or file path to upload.
-*   `--uploadTo`: Target path in OSS or COS.
+*   `--ossCredentials`: Path to the Alibaba Cloud OSS configuration file (in JSON format), must include `bucket`, `accessKeyId`, `accessKeySecret`, and `region`.
+*   `--cosCredentials`: Path to the Tencent Cloud COS configuration file (in JSON format), must include `Bucket`, `SecretId`, `SecretKey`, and `Region`.
+*   `--source`: Specify the local directory or file path to upload.
+*   `--target`: Target path in OSS or COS.
 *   `--lastFile`: The last file to upload (default is `index.html`).
-*   `--maxRetryCount`: Maximum number of retry attempts (default is 5).
+*   `--retryLimit`: Maximum number of retry attempts (default is 5).
 *   `--concurrency`: Limit on the number of concurrent uploads (default is 10).
 *   `--headers`: Custom request headers (in JSON format).
-*   `--customConfigPaths`: Paths to custom configuration files (in JSON format array).
+*   `--uploaderModules`: Paths to custom configuration files (in JSON format array).
 *   `--ossHeaders`: OSS request headers (in JSON format).
 *   `--cosHeaders`: COS request headers (in JSON format).
 
 ### Configuration File Example
 
-For an Alibaba Cloud OSS configuration (ossConfig.json):
+For an Alibaba Cloud OSS configuration (ossCredentials.json):
 
 ```json
 {
@@ -96,25 +96,25 @@ To display help information, run:
 multi-cloud-uploader --help
 ```
 
-## Custom Configuration Loading with customConfigPaths
+## Custom Configuration Loading with uploaderModules
 
-You can dynamically load specific uploader configuration files (beyond OSS and COS) using the `customConfigPaths` parameter. This parameter should be a JSON array that can contain multiple configuration file paths.
+You can dynamically load specific uploader configuration files (beyond OSS and COS) using the `uploaderModules` parameter. This parameter should be a JSON array that can contain multiple configuration file paths.
 
 ### Command-Line Example
 
 ```bash
-multi-cloud-uploader --uploadFrom=<source directory> --uploadTo=<destination directory> --customConfigPaths='[<config file path1>, <config file path2>]' --ossConfig=<oss configuration file>
+multi-cloud-uploader --source=<source directory> --target=<destination directory> --uploaderModules='[<config file path1>, <config file path2>]' --ossCredentials=<oss configuration file>
 ```
 
 For example:
 
 ```json
-"uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./upload/ossUpload.js\"]' --ossConfig=./oss.tice.conf.json",
+"uploader:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./upload/ossUpload.js\"]' --ossCredentials=./oss.tice.conf.json",
 ```
 
 ### Configuration Steps
 
-For OSS, follow these steps ([ossConfig.json](https://github.com/SailingCoder/multi-cloud-uploader/tree/main/example/config)):
+For OSS, follow these steps ([ossCredentials.json](https://github.com/SailingCoder/multi-cloud-uploader/tree/main/example/config)):
 
 1. **Code Implementation**
 
@@ -137,15 +137,15 @@ class UploadCopyOss extends BaseUploader {
   }
 
   // Actual file upload function
-  async uploadSingleFile(file, targetPath) {
+  async uploadSingleFile(file, target) {
     try {
-      const result = await this.client.put(targetPath, file, {
+      const result = await this.client.put(target, file, {
         headers: this.headers, // Optional
       });
       return {
         success: result?.res?.status === 200, // Required field
         status: result?.res?.status, // Required field
-        // message: `File ${file} uploaded successfully to ${targetPath}`, // Optional
+        // message: `File ${file} uploaded successfully to ${target}`, // Optional
         // extra: result,  // Optional
       };
     } catch (error) {
@@ -172,7 +172,7 @@ Add to your scripts:
 
 ```json
 "scripts": {
-  "uploaderRegistryOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
+  "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
 }
 ```
 
@@ -180,7 +180,7 @@ Or And COS：
 
 ```json
 "scripts": {
-  "uploaderRegistryOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json --cosConfig=./config/cos.tice.conf.json"
+  "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json --cosCredentials=./config/cos.tice.conf.json"
 }
 ```
 

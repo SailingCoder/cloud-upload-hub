@@ -2,7 +2,7 @@
 // 然后在命令行执行, 即可上传文件到阿里云 OSS
 /*
 "scripts": {
-  "uploaderRegistryOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
+  "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
 },
 */
 const OSS = require('ali-oss')
@@ -21,15 +21,15 @@ class UploadCopyOss extends BaseUploader {
   }
 
   // 实际的文件上传函数
-  async uploadSingleFile(file, targetPath) {
+  async uploadSingleFile(file, target) {
     try {
-      const result = await this.client.put(targetPath, file, {
+      const result = await this.client.put(target, file, {
         headers: this.headers, // 选填
       });
       return {
         success: result?.res?.status === 200, // 必填字段
         status: result?.res?.status, // 必填字段
-        // message: `文件 ${file} 上传成功到 ${targetPath}`, 默认: `${file} -> ${targetPath}` // 选填
+        // message: `文件 ${file} 上传成功到 ${target}`, 默认: `${file} -> ${target}` // 选填
         // extra: result,  // 选填
       };
     } catch (error) {

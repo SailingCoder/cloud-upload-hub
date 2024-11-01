@@ -3,9 +3,9 @@ const { runConcurrentLimit } = require('../utils/tasks')
 
 class BaseUploader {
   constructor(options) {
-    this.uploadFrom = options.uploadFrom;
-    this.uploadTo = options.uploadTo;
-    this.maxRetryCount = options.maxRetryCount || 5;
+    this.source = options.source;
+    this.target = options.target;
+    this.retryLimit = options.retryLimit || 5;
     this.concurrencyLimit = options.concurrencyLimit || 10; // 并发上传数量控制
     this.successTotal = 0;
     this.fileTotal = options.fileTotal || 0
@@ -24,11 +24,11 @@ class BaseUploader {
   // 上传单个文件，并增加重试机制
   async uploadSingleFileWithRetry(file, retryCount = 0) {
     try {
-      const targetPath = path.join(this.uploadTo, path.relative(this.uploadFrom, file));
-      const result = await this.uploadSingleFile(file, targetPath);
+      const target = path.join(this.target, path.relative(this.source, file));
+      const result = await this.uploadSingleFile(file, target);
       if (result?.success) {
         this.successTotal++;
-        const msg = result?.message ? result?.message : `${file} -> ${targetPath}`;
+        const msg = result?.message ? result?.message : `${file} -> ${target}`;
         console.log(`[${this.type}][OK][${this.successTotal}/${this.fileTotal}][${new Date().toISOString()}]${retryCount ? `(${retryCount + 1})`: ''}: ${msg}`)
       } else {
         const messages = [];
@@ -41,7 +41,7 @@ class BaseUploader {
         throw new Error(messages.length > 0 ? messages.join(', ') : '未知错误');
       }
     } catch (error) {
-      if (retryCount < this.maxRetryCount) {
+      if (retryCount < this.retryLimit) {
         console.warn(`[${this.type}][WARN][${new Date().toISOString()}]: 上传异常，正在重试 #${retryCount + 1}，文件: ${file}`);
         // console.warn(`[OSS][WARN]: 上传 OSS 异常，正在重试 ${file}，重试次数：${retryCount + 1}`);
         await this.uploadSingleFileWithRetry(file, retryCount + 1);
@@ -53,7 +53,7 @@ class BaseUploader {
   }
 
   // 实际的文件上传函数
-  async uploadSingleFile(file, targetPath) {
+  async uploadSingleFile(file, target) {
     throw new Error("uploadSingleFile 方法未实现"); // 子类需要实现该方法
   }
 }

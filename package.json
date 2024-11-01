@@ -6,10 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish --loglevel verbose",
-    "uploaderOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --ossConfig=./config/oss.tice.conf.json",
-    "uploaderCOS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./config/cos.tice.conf.json",
-    "uploader:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --cosConfig=./config/cos.tice.conf.json --ossConfig=./config/oss.tice.conf.json",
-    "uploaderRegistryOSS:tice": "multi-cloud-uploader --uploadFrom=src --uploadTo=test/sailing  --customConfigPaths='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
+    "uploaderOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderCOS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
+    "uploader:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
+    "uploaderConfig:tice": "multi-cloud-uploader --mode=tice"
   },
   "keywords": [
     "upload",

@@ -1,37 +1,61 @@
 // uploaderRegistry.js 用户注册上传器的接口
-const minimist = require("minimist");
+const { validateConfig, isPromise } = require("../utils/validate");
 const { loadConfig } = require("../utils/file");
-const { validateConfig } = require("../utils/validate");
+const { getConfigData } = require("../store/config");
 
-const argv = minimist(process.argv.slice(2));
 const uploaders = [];
 
-function registerUploader(UploaderClass, config) {
-  const configName = config?.configName; // 配置文件名
-  const configRequiredFields = config?.configRequiredFields; // 配置文件必填字段
-  const headerName = config?.headerName; // 头部配置名
-  const type = config?.type; // 上传器类型
+// 获取上传器配置数据，支持传递 ”函数、对象、字符串“ 3 种类型
+function getUploaderConfigData(uploaderConfig) {
+  if (typeof uploaderConfig === 'function') {
+    const result = uploaderConfig();
+    if (isPromise(result)) {
+      throw new Error("Uploader config function must be synchronous");
+    }
+    return result || {};
+  } else if (typeof uploaderConfig === 'object') {
+    return uploaderConfig;
+  } else if (typeof uploaderConfig === 'string') {
+    return loadConfig(uploaderConfig);
+  }
+  return {};
+}
+
+// 注册上传器
+function registerUploader(UploaderClass, options) {
+  const configData = getConfigData();
+
+  const configName = options?.configName; // 配置文件名
+  const configRequiredFields = options?.configRequiredFields; // 配置文件必填字段
+  const headerName = options?.headerName; // 头部配置名
+  const type = options?.type; // 上传器类型
   try {
-    if (!argv[configName]) {
+    const uploaderConfig = configData(configName); // 上传器配置名，可以为函数、对象、字符串
+    if (!uploaderConfig) {
+      // console.warn(`${type}上传器配置不存在: ${configName}`);
       return
     }
 
-    const configData = loadConfig(argv[configName]);
-    const headers = argv[headerName] ? JSON.parse(argv[headerName]) : {};
-    validateConfig(configData, configRequiredFields, type);
+    const uploaderConfigData = getUploaderConfigData(uploaderConfig);
+
+    const headers = configData[headerName] ? JSON.parse(configData[headerName]) : {};
+
+    if (configRequiredFields?.length) { // 配置文件必填字段
+      validateConfig(uploaderConfigData, configRequiredFields, type);
+    }
 
     const defaultConfig = {
-      uploadFrom: argv.uploadFrom,
-      uploadTo: argv.uploadTo,
-      maxRetryCount: Number(argv.maxRetryCount) || 5,
-      concurrencyLimit: Number(argv.concurrency) || 10,
+      source: configData.source,
+      target: configData.target,
+      retryLimit: Number(configData.retryLimit) || 5,
+      concurrencyLimit: Number(configData.concurrency) || 10,
       headers,
       type,
     };
 
     const uploaderInstance = new UploaderClass({
-      ...configData,
       ...defaultConfig,
+      ...uploaderConfigData,
     });
 
     uploaders.push(uploaderInstance);

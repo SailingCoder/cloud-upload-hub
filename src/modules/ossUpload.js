@@ -1,6 +1,6 @@
 const OSS = require('ali-oss')
-const { BaseUploader } = require('./baseUploader')
-const { registerUploader } = require('./uploaderRegistry')
+const { BaseUploader } = require('../upload/baseUploader')
+const { registerUploader } = require('../upload/uploaderRegistry')
 class UploadAliOss extends BaseUploader {
   constructor(options) {
     super(options); // 调用基类构造函数
@@ -14,15 +14,15 @@ class UploadAliOss extends BaseUploader {
   }
 
   // 实际的文件上传函数
-  async uploadSingleFile(file, targetPath) {
+  async uploadSingleFile(file, target) {
     try {
-      const result = await this.client.put(targetPath, file, {
+      const result = await this.client.put(target, file, {
         headers: this.headers,
       });
       return {
         success: result?.res?.status === 200,
         status: result?.res?.status,
-        // message: `文件 ${file} 上传成功到 ${targetPath}`, 默认: `${file} -> ${targetPath}`
+        // message: `文件 ${file} 上传成功到 ${target}`, 默认: `${file} -> ${target}`
         extra: result,
       };
     } catch (error) {
@@ -36,7 +36,7 @@ class UploadAliOss extends BaseUploader {
 
 // 设置 OSS 上传器
 registerUploader(UploadAliOss, {
-  configName: 'ossConfig', // 配置文件名
+  configName: 'ossCredentials', // 配置文件名
   configRequiredFields: ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], // 必填字段
   headerName: 'ossHeaders', // 头部配置
   type: 'OSS', // 上传器类型
