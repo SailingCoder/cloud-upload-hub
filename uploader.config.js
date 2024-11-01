@@ -50,8 +50,8 @@ const defineConfig = ({ mode }) => {
       //   console.error('通知失败', error);
       // });  
     },
-    onUploadFail(status) {  // 失败处理函数
-      console.log('构建失败', status);
+    onUploadFail(status, messgae) {  // 失败处理函数
+      console.log('构建失败', status, messgae);
       // axios.post('https://api.github.com/repos/xxx/xxx/deployments', {
       //   headers: {
       //     Authorization: `Bearer xxx`  // 认证信息
