@@ -51,7 +51,7 @@ const defineConfig = ({ mode }) => {
       // });  
     },
     onUploadFail(status, messgae) {  // 失败处理函数
-      console.log('构建失败', status, messgae);
+      console.log('错误返回', status, messgae);
       // axios.post('https://api.github.com/repos/xxx/xxx/deployments', {
       //   headers: {
       //     Authorization: `Bearer xxx`  // 认证信息

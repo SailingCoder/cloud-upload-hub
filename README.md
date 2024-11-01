@@ -93,7 +93,7 @@ const defineConfig = ({ mode }) => {
 | **lastFile**        | 最后上传的文件（默认 `index.html`），指定上传顺序中的最后文件。                                           | 否    | 是     | 是                     |
 | **uploaderModules** | 自定义上传模块配置，可以加载其他上传逻辑。                                                            | 否    | 是     | 是                     |
 | **onUploadSuccess** | 上传成功的回调函数，接收上传状态。                                                                | 否    | 否     | 是                     |
-| **onUploadFail**    | 上传失败的回调函数，接收失败状态。                                                                | 否    | 否     | 是                     |
+| **onUploadFail**    | 上传失败的回调函数，接收失败状态。  onUploadFail(status<1:资源上传前；2：资源文件上传过程中；3：生效文件上传过程中>, message)                                                              | 否    | 否     | 是                     |
 
 这样更全面地展示了参数的使用情况，方便开发者选择适合的配置方式。如果还有其他需求或调整，请告诉我！
 ### Credentials
