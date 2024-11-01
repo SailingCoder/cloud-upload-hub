@@ -31,7 +31,8 @@ function loadDefaultConfig() {
       source: argv.source,
       target: argv.target,
       lastFileName: argv.lastFile || "index.html",
-      uploaderModules: JSON.parse(argv?.uploaderModules || '[]')
+      uploaderModules: JSON.parse(argv?.uploaderModules || '[]'),
+      ...argv,
     };
   }
   

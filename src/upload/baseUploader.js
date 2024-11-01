@@ -20,6 +20,10 @@ class BaseUploader {
   setFileTotal(total) {
     this.fileTotal = total;
   }
+  
+  getUploaderType() {
+    return this.type
+  }
 
   // 上传单个文件，并增加重试机制
   async uploadSingleFileWithRetry(file, retryCount = 0) {

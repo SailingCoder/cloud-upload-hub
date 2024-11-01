@@ -47,9 +47,11 @@ async function runUpload() {
 
 async function uploadFiles(otherFiles, files) {
     for (const uploader of uploaders) {
+        const uploaderName = uploader.getUploaderType();
+        console.log(`开始上传 ${uploaderName} 资源文件... \n`);
         await uploader.setFileTotal(files.length);
         await uploader.uploadFile(otherFiles);
-        console.log("");
+        console.log(`${uploaderName} 资源上传完成 \n`);
     }
 }
 
@@ -58,13 +60,15 @@ async function uploadLastFile(lastFile) {
         return;
     }
     try {
-        const lastFileUploadPromises = uploaders.map((uploader) =>
+        const lastFileUploadPromises = uploaders.map((uploader) => {
+            console.log(`开始上传 ${uploader.getUploaderType()} 生效文件... \n`);
             uploader.uploadSingleFileWithRetry(lastFile)
-        );
+            console.log(`${uploader.getUploaderType()} 生效文件上传完成 \n`);
+        });
         await Promise.all(lastFileUploadPromises);
         console.log("");
     } catch (error) {
-        console.error("最后一个生效文件上传失败:", error.message);
+        // console.error("最后一个生效文件上传失败:", error.message);
         const config = getConfigData();
         if (config.onFail && typeof config.onFail === "function") {
             config.onFail(error.message);

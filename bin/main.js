@@ -28,8 +28,8 @@ function runLoadConfig() {
     const configData = loadDefaultConfig();
 
     // 静态加载上传器
-    require("../modules/cosUpload.js");
-    require("../modules/ossUpload.js");
+    require("../src/modules/cosUpload.js");
+    require("../src/modules/ossUpload.js");
 
     // 动态加载上传器
     loadUploadModules(configData.uploaderModules);

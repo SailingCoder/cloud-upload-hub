@@ -30,7 +30,7 @@ function registerUploader(UploaderClass, options) {
   const headerName = options?.headerName; // 头部配置名
   const type = options?.type; // 上传器类型
   try {
-    const uploaderConfig = configData(configName); // 上传器配置名，可以为函数、对象、字符串
+    const uploaderConfig = configData[configName]; // 上传器配置名，可以为函数、对象、字符串
     if (!uploaderConfig) {
       // console.warn(`${type}上传器配置不存在: ${configName}`);
       return
