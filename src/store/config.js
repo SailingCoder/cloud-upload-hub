@@ -1,12 +1,12 @@
 // config/loadConfig.js
 const fs = require('fs');
 const path = require('path');
-const minimist = require('minimist');
+const { getArgv } = require('../utils/process');
 
 let configData = {}; // 存储配置数据
 
 function loadDefaultConfig() {
-  const argv = minimist(process.argv.slice(2));
+  const argv = getArgv();
   const configFilePath = path.resolve(process.cwd(), 'uploader.config.js');
 
   // 检查是否有配置文件

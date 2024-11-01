@@ -1,5 +1,5 @@
 const path = require('path')
-const { runConcurrentLimit } = require('../utils/tasks')
+const { runConcurrentLimit } = require('../utils/process')
 
 class BaseUploader {
   constructor(options) {

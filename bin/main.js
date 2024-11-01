@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 const { displayHelp } = require("../src/utils/file");
-const { runLoadConfig } = require('../src/upload/loadConfig');
 const { runUpload } = require('../src/upload/uploaderData');
 const { loadDefaultConfig } = require('../src/store/config');
+const { getArgv } = require('../src/utils/process');
 
 // 如果用户输入 --help，显示命令使用说明
-if (argv.help) {
+if (getArgv().help) {
   displayHelp();
   process.exit(0);
 }

@@ -1,6 +1,6 @@
-const { getUploadFiles, separatelastFile } = require("../src/utils/file");
-const { uploaders } = require('../src/upload/uploaderRegistry');
-const { getConfigData } = require('../src/store/config');
+const { getUploadFiles, separatelastFile } = require("../utils/file");
+const { uploaders } = require('../upload/uploaderRegistry');
+const { getConfigData } = require('../store/config');
 
 async function runUpload() {
     const configData = getConfigData()
