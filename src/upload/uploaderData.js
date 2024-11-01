@@ -1,24 +1,25 @@
 const { getUploadFiles, separatelastFile } = require("../utils/file");
 const { uploaders } = require('../upload/uploaderRegistry');
 const { getConfigData } = require('../store/config');
+const { getMessage } = require('../utils/locales');
 
 async function runUpload() {
     const configData = getConfigData()
     try {
         if (!configData.source || !configData.target) {
-            console.error("请提供【source】和【target】参数进行上传。");
-            process.exit(1);
+            console.error(getMessage("sourceRequired"));
+            throw new Error(getMessage("sourceRequired"));
         }
 
         if (uploaders.length === 0) {
-            console.error("没有可用的上传器，请检查配置。");
-            process.exit(1);
+            console.error(getMessage("noUploader"));
+            throw new Error(getMessage("noUploader"));
         }
 
         const files = getUploadFiles(configData.source);
         if (files.length === 0) {
-            console.log("没有找到待上传的文件");
-            process.exit(0);
+            console.log(getMessage("noFilesFound"));
+            throw new Error(getMessage("noFilesFound"));
         }
         const [lastFile, otherFiles] = separatelastFile(
             files,
@@ -40,8 +41,9 @@ async function runUpload() {
     } catch (error) {
         console.error("上传过程中发生错误:", error.message);
         if (configData.onUploadFail && typeof configData.onUploadFail === "function") {
-            configData.onUploadFail(error.message);
+            configData.onUploadFail(1, error.message);
         }
+        process.exit(1);
     }
 }
 
@@ -71,7 +73,7 @@ async function uploadLastFile(lastFile) {
         // console.error("最后一个生效文件上传失败:", error.message);
         const config = getConfigData();
         if (config.onUploadFail && typeof config.onUploadFail === "function") {
-            config.onUploadFail(error.message);
+            config.onUploadFail(2, error.message);
         }
     }
 }

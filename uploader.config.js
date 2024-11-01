@@ -21,10 +21,15 @@ const defineConfig = ({ mode }) => {
     //   SecretId: 'xxx',  // COS的秘密ID
     //   SecretKey: 'xxx'  // COS的秘密密钥
     // }),
-    // uploaderModules: [
+    // uploaderModules: [ // 自定义上传路径 或者 注入函数
     //   "./src/upload/ossUpload", 
     //   "./src/upload/cosUpload",
-    // ],  // 自定义上传路径
+    //   async () => {
+    //     // 1、extend BaseUploader
+    //     // 2、registerUploader
+    //     // 具体代码参考 uploaderRegistryOSS.js
+    //   }
+    // ],  
     onUploadSuccess(status) {  // 成功处理函数
       console.log('构建成功', status);
       // axios.post('https://api.github.com/repos/xxx/xxx/deployments', {
