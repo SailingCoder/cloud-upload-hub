@@ -4,11 +4,6 @@
 
 这个库的目的是通过简洁的 API，开发者可以轻松集成多个云平台的文件上传功能，无需重复实现不同平台的逻辑。
 
-![npm version](https://img.shields.io/npm/v/multi-cloud-uploader)
-
-[English Documentation](https://github.com/SailingCoder/multi-cloud-uploader/blob/main/doc/README_EN.md)
-
-
 ## 特性
 
 *   **多种云存储支持**：支持 OSS、COS 等，用户可动态选择单个或多个上传。
@@ -144,6 +139,60 @@ uploaderModules: [ // 自定义上传路径 或者 注入函数
 ]
 ```
 
+uploaderRegistryOSS.js
+
+```js
+// 代码例子，可按照下面的代码进行修改。（代码就按照这个复制、粘贴，改改）
+/*
+"scripts": {
+  "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
+},
+*/
+const OSS = require('ali-oss')
+const { BaseUploader, registerUploader } = require('multi-cloud-uploader');
+
+class UploadCopyOss extends BaseUploader {
+  constructor(options) {
+    super(options); // 调用基类构造函数
+    this.client = new OSS({
+      region: options.region,
+      accessKeyId: options.accessKeyId,
+      accessKeySecret: options.accessKeySecret,
+      bucket: options.bucket,
+    });
+    this.headers = options.headers || {}; // 选填
+  }
+
+  // 实际的文件上传函数
+  async uploadSingleFile(file, target) {
+    try {
+      const result = await this.client.put(target, file, {
+        headers: this.headers, // 选填
+      });
+      return {
+        success: result?.res?.status === 200, // 必填字段
+        status: result?.res?.status, // 必填字段
+        // message: `文件 ${file} 上传成功到 ${target}`, 默认: `${file} -> ${target}` // 选填
+        // extra: result,  // 选填
+      };
+    } catch (error) {
+      return {
+        success: false, // 必填字段
+        message: error.message, // 必填字段
+      };
+    }
+  }
+}
+
+// 设置 OSS 上传器
+registerUploader(UploadCopyOss, {
+  configName: 'ossCopyConfig', // 配置文件名，与命令行对应, 必填
+  configRequiredFields: ['bucket', 'accessKeyId', 'accessKeySecret', 'region'], // 必填
+  // headerName: 'ossCopyHeaders', // 头部配置, 选填
+  type: 'ossCopy', // 上传器类型, 必填
+})
+```
+
 ## 常见问题
 
 ### 1. 如何更改上传目标？
@@ -168,12 +217,3 @@ onUploadFail(status) {
   console.log('构建失败', status);
 },
 ```
-
-
-## 沟通
-
-如有意见和问题，欢迎来[issues](https://github.com/SailingCoder/multi-cloud-uploader/issues)沟通。
-
-## 许可证
-
-该项目使用 [MIT 许可证](LICENSE)。
