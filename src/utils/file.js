@@ -43,7 +43,7 @@ function loadConfig(configPath) {
   try {
     config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
   } catch (error) {
-    throw new Error(`${configPath} 配置文件加载失败: ${error.message}`); // 直接抛出错误
+    throw new Error(`${configPath} 文件加载失败: ${error.message}`); // 直接抛出错误
   }
   return config;
 }

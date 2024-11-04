@@ -90,7 +90,7 @@ const defineConfig = ({ mode }) => {
 | **onUploadSuccess** | 上传成功的回调函数，接收上传状态。                                                                | 否    | 否     | 是                     |
 | **onUploadFail**    | 上传失败的回调函数，接收失败状态。  onUploadFail(status<1:资源上传前；2：资源文件上传过程中；3：生效文件上传过程中；4：加载配置文件>, message)                                                              | 否    | 否     | 是                     |
 
-这样更全面地展示了参数的使用情况，方便开发者选择适合的配置方式。如果还有其他需求或调整，请告诉我！
+
 ### Credentials
 
 Credentials 目前支持 OSS 和 COS，二选一，必填项。
@@ -129,8 +129,7 @@ multi-cloud-uploader --source=<源目录> --target=<目标目录> --ossCredentia
 
 ```js
 uploaderModules: [ // 自定义上传路径 或者 注入函数
-  "./src/upload/ossUpload", 
-  "./src/upload/cosUpload",
+  "./example/uploaderRegistryOSS.js", 
   async () => {
     // 1、extend BaseUploader
     // 2、registerUploader
