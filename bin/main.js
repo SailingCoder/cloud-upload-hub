@@ -33,8 +33,8 @@ async function runUpload() {
     console.log(`====== 文件上传完成 ======`);
 
     const configData = getConfigData()
-    if (configData.onSuccess && typeof configData.onSuccess === "function") {
-        configData.onSuccess();
+    if (configData.onUploadSuccess && typeof configData.onUploadSuccess === "function") {
+        configData.onUploadSuccess();
     }
   } catch (error) {
     if (error.code === 1) {
