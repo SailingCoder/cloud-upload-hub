@@ -32,13 +32,13 @@ async function runUpload() {
     }
   } catch (error) {
     if (error.code === 1) {
-      console.error("【error】资源准备阶段", error.message);
+      console.error(error.message);
     } else if (error.code === 2) {
-      console.error("【error】资源文件上传阶段", error.message);
+      console.error(error.message);
     } else if (error.code === 3) {
-      console.error("【error】生效文件上传阶段", error.message);
+      console.error(error.message);
     } else if (error.code === 4) {
-      console.error("【error】加载配置文件:", error.message);
+      console.error(error.message);
     } else {
       console.error("【error】未知错误:", error.message);
     }
@@ -63,7 +63,7 @@ function runLoadConfig() {
   } catch (error) {
     throw {
       code: 4,
-      message: `${error.message}`,
+      message: `【error】加载配置文件: ${error.message}`,
     };
   }
 }

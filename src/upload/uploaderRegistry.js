@@ -60,8 +60,7 @@ function registerUploader(UploaderClass, options) {
 
     uploaders.push(uploaderInstance);
   } catch (error) {
-    console.error(`上传器注册失败: ${type}`, error);
-    process.exit(1);
+    throw new Error(`上传器注册失败: ${type}, ${error.message}`);
   }
 }
 
