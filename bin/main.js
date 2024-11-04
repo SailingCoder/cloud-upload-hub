@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const { displayHelp } = require("../src/utils/file");
-const { runUpload } = require('../src/upload/uploaderData');
+const { loadUploadFiles, uploadFiles, uploadLastFile } = require('../src/upload/uploaderData');
 const { loadDefaultConfig } = require('../src/store/config');
 const { getArgv } = require('../src/utils/process');
 
@@ -10,11 +10,42 @@ if (getArgv().help) {
   process.exit(0);
 }
 
-run()
+runUpload()
 
-function run() {
-  runLoadConfig(); // 加载配置
-  runUpload(); // 执行上传
+async function runUpload() {
+  try {
+    runLoadConfig(); // 加载配置
+    // 执行上传
+    const [files, lastFile, otherFiles] = await loadUploadFiles();
+
+    console.log(`====== 共扫描了${files.length}个文件，开始上传资源文件。 ======\n`);
+    await uploadFiles(otherFiles, files);
+
+    if (lastFile) {
+        console.log(`====== 开始上传生效文件。 ====== \n`);
+        await uploadLastFile(lastFile);
+    }
+
+    console.log(`====== 文件上传完成 ======`);
+    if (configData.onSuccess && typeof configData.onSuccess === "function") {
+        configData.onSuccess();
+    }
+  } catch (error) {
+    if (error.code === 1) {
+      console.error("【error】资源准备阶段", error.message);
+    } else if (error.code === 2) {
+      console.error("【error】资源文件上传阶段", error.message);
+    } else if (error.code === 3) {
+      console.error("【error】生效文件上传阶段", error.message);
+    } else if (error.code === 4) {
+      console.error("【error】加载配置文件:", error.message);
+    } else {
+      console.error("【error】未知错误:", error.message);
+    }
+    if (configData.onUploadFail && typeof configData.onUploadFail === "function") {
+      configData.onUploadFail(error.code, error.message);
+    }
+  }
 }
 
 // 加载配置文件
@@ -30,11 +61,10 @@ function runLoadConfig() {
     // 动态加载上传器
     loadUploadModules(configData.uploaderModules);
   } catch (error) {
-    console.error("【error】加载配置文件:", error.message);
-    if (config.onUploadFail && typeof config.onUploadFail === "function") {
-      config.onUploadFail(4, error.message);
-    }
-    process.exit(1);
+    throw {
+      code: 4,
+      message: `${error.message}`,
+    };
   }
 }
 
@@ -49,6 +79,6 @@ async function loadUploadModules(paths = []) {
       }
     }
   } catch (error) {
-    throw new Error(`加载上传器配置文件失败, ${error.message}`);
+    throw new Error(`动态加载上传器失败, ${error.message}`);
   }
 }
