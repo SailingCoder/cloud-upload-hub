@@ -14,13 +14,17 @@ runUpload()
 
 async function runUpload() {
   try {
-    runLoadConfig(); // 加载配置
-    // 执行上传
+    // 加载配置
+    runLoadConfig(); 
+    
+    // 加载上传文件
     const [files, lastFile, otherFiles] = await loadUploadFiles();
 
+    // 上传资源文件
     console.log(`====== 共扫描了${files.length}个文件，开始上传资源文件。 ======\n`);
     await uploadFiles(otherFiles, files);
 
+    // 上传生效文件
     if (lastFile) {
         console.log(`====== 开始上传生效文件。 ====== \n`);
         await uploadLastFile(lastFile);
@@ -43,7 +47,7 @@ async function runUpload() {
       console.error("【error】未知错误:", error.message);
     }
     if (configData.onUploadFail && typeof configData.onUploadFail === "function") {
-      configData.onUploadFail(error.code, error.message);
+      configData.onUploadFail(error.code || 0, error.message);
     }
   }
 }
