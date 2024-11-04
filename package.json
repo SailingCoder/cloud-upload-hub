@@ -10,7 +10,7 @@
     "uploaderCOS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
     "uploader:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
     "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
-    "uploaderConfig:tice": "multi-cloud-uploader --mode=tice"
+    "uploaderConfig:tice": "multi-cloud-uploader --mode=test"
   },
   "keywords": [
     "upload",

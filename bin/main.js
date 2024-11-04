@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const { displayHelp } = require("../src/utils/file");
 const { loadUploadFiles, uploadFiles, uploadLastFile } = require('../src/upload/uploaderData');
-const { loadDefaultConfig } = require('../src/store/config');
+const { loadDefaultConfig, getConfigData } = require('../src/store/config');
 const { getArgv } = require('../src/utils/process');
 
 // 如果用户输入 --help，显示命令使用说明
@@ -15,8 +15,8 @@ runUpload()
 async function runUpload() {
   try {
     // 加载配置
-    runLoadConfig(); 
-    
+    await runLoadConfig();
+
     // 加载上传文件
     const [files, lastFile, otherFiles] = await loadUploadFiles();
 
@@ -31,6 +31,8 @@ async function runUpload() {
     }
 
     console.log(`====== 文件上传完成 ======`);
+
+    const configData = getConfigData()
     if (configData.onSuccess && typeof configData.onSuccess === "function") {
         configData.onSuccess();
     }
@@ -46,6 +48,7 @@ async function runUpload() {
     } else {
       console.error("【error】未知错误:", error.message);
     }
+    const configData = getConfigData()
     if (configData.onUploadFail && typeof configData.onUploadFail === "function") {
       configData.onUploadFail(error.code || 0, error.message);
     }
@@ -53,17 +56,17 @@ async function runUpload() {
 }
 
 // 加载配置文件
-function runLoadConfig() {
+async function runLoadConfig() {
   try {
     // 获取命令行参数
-    const configData = loadDefaultConfig();
+    const configData = await loadDefaultConfig();
 
     // 静态加载上传器
     require("../src/modules/cosUpload.js");
     require("../src/modules/ossUpload.js");
 
     // 动态加载上传器
-    loadUploadModules(configData.uploaderModules);
+    await loadUploadModules(configData.uploaderModules);
   } catch (error) {
     throw {
       code: 4,
