@@ -1,20 +1,22 @@
 const path = require('path')
 const { runConcurrentLimit } = require('../utils/process')
+const { formatTime } = require('../utils/time')
 
 class BaseUploader {
   constructor(options) {
     this.source = options.source;
     this.target = options.target;
     this.retryLimit = options.retryLimit || 5;
-    this.concurrencyLimit = options.concurrencyLimit || 10; // 并发上传数量控制
+    this.maxConcurrent = options.maxConcurrent || 10; // 并发上传数量控制
     this.successTotal = 0;
-    this.fileTotal = options.fileTotal || 0
-    this.type = options.type
+    this.fileTotal = options.fileTotal || 0;
+    this.type = options.type;
+    this.format = options.format || '';
   }
 
   async uploadFile(files) {
     const tasks = files.map((file) => () => this.uploadSingleFileWithRetry(file));
-    await runConcurrentLimit(tasks, this.concurrencyLimit); // 控制并发上传
+    await runConcurrentLimit(tasks, this.maxConcurrent); // 控制并发上传
   }
 
   setFileTotal(total) {
@@ -33,7 +35,8 @@ class BaseUploader {
       if (result?.success) {
         this.successTotal++;
         const msg = result?.message ? result?.message : `${file} -> ${target}`;
-        console.log(`[${this.type}][OK][${this.successTotal}/${this.fileTotal}][${new Date().toISOString()}]${retryCount ? `(${retryCount + 1})`: ''}: ${msg}`)
+        const createTime = this.format ? formatTime(this.format) : new Date().toISOString();
+        console.log(`[${this.type}][OK][${this.successTotal}/${this.fileTotal}][${createTime}]${retryCount ? `(${retryCount + 1})`: ''}: ${msg}`)
       } else {
         const messages = [];
         if (result?.status) {
@@ -45,12 +48,13 @@ class BaseUploader {
         throw new Error(messages.length > 0 ? messages.join(', ') : '未知错误');
       }
     } catch (error) {
+      const createTime = this.format ? formatTime(this.format) : new Date().toISOString();
       if (retryCount < this.retryLimit) {
-        console.warn(`[${this.type}][WARN][${new Date().toISOString()}]: 上传异常，正在重试 #${retryCount + 1}，文件: ${file}`);
+        console.warn(`[${this.type}][WARN][${createTime}]: 上传异常，正在重试 #${retryCount + 1}，文件: ${file}`);
         // console.warn(`[OSS][WARN]: 上传 OSS 异常，正在重试 ${file}，重试次数：${retryCount + 1}`);
         await this.uploadSingleFileWithRetry(file, retryCount + 1);
       } else {
-        console.error(`[${this.type}][ERROR][${new Date().toISOString()}]: 上传失败，文件: ${file}, message：${error.message}`);
+        console.error(`[${this.type}][ERROR][${createTime}]: 上传失败，文件: ${file}, message：${error.message}`);
         throw error;
       }
     }

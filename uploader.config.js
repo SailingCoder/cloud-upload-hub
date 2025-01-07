@@ -1,10 +1,10 @@
-const axios = require('axios');
+// const axios = require('axios');
 
-const gettarget = (mode) => {
+const getTargetPath = (mode) => {
   const targets = {
-    test: 'test/sailing',
-    tice: 'tice/sailing',
-    prod: 'prod/sailing',
+    test: 'test/test',
+    tice: 'test/tice',
+    prod: 'test/prod',
   };
   return targets[mode] || targets.test; // 默认使用 test
 };
@@ -12,7 +12,7 @@ const gettarget = (mode) => {
 const defineConfig = ({ mode }) => {
   return {
     source: 'src',  // 上传源路径
-    target: 'test/sailing',  // 上传目标路径
+    target: getTargetPath(mode),  // 上传目标路径
     retryLimit: 5,  // 重试次数
     maxConcurrent: 10,  // 最大并发量
     lastFile: 'index.html',  // 最后一个文件

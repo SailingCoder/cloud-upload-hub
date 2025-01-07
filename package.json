@@ -10,7 +10,7 @@
     "uploaderCOS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
     "uploader:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
     "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
-    "uploaderConfig:tice": "multi-cloud-uploader --mode=test"
+    "uploader:test": "multi-cloud-uploader --mode=test"
   },
   "keywords": [
     "upload",
@@ -32,6 +32,7 @@
   "dependencies": {
     "ali-oss": "^6.17.1",
     "cos-nodejs-sdk-v5": "^2.14.6",
+    "dayjs": "^1.11.13",
     "minimist": "^1.2.6"
   }
 }

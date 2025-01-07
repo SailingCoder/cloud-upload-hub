@@ -31,7 +31,7 @@ async function loadUploadFiles() {
     } catch (error) {
         throw {
             code: 1,
-            message: `【error】资源准备阶段: ${error.message}`,
+            message: `${error.message}`,
         };
     }
     return [files, lastFile, otherFiles];
@@ -50,7 +50,7 @@ async function uploadFiles(otherFiles, files) {
     } catch (error) {
         throw {
             code: 2,
-            message: `【error】资源文件上传阶段: ${error.message}`,
+            message: `${error.message}`,
         };
     }
     
@@ -69,7 +69,7 @@ async function uploadLastFile(lastFile) {
     } catch (error) {
         throw {
             code: 3,
-            message: `【error】生效文件上传阶段: ${error.message}`,
+            message: `${error.message}`,
         };
     }
 }

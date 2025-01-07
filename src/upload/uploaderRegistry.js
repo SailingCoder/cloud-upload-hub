@@ -48,9 +48,10 @@ function registerUploader(UploaderClass, options) {
       source: configData.source,
       target: configData.target,
       retryLimit: Number(configData.retryLimit) || 5,
-      concurrencyLimit: Number(configData.concurrency) || 10,
+      maxConcurrent: Number(configData.maxConcurrent) || 10,
       headers,
       type,
+      format: configData.format,
     };
 
     const uploaderInstance = new UploaderClass({

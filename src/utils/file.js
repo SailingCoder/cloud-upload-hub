@@ -77,7 +77,7 @@ function displayHelp() {
       --source         指定上传源文件夹路径。
       --target           指定上传目标路径。
       --retryLimit      指定最大重试次数（默认为5）。
-      --concurrency        指定并发上传的数量限制（默认为10）。
+      --maxConcurrent        指定并发上传的数量限制（默认为10）。
       --lastFile           最后一个上传的文件（默认为 index.html）。
       --headers            指定自定义请求头信息（JSON格式）。
       --uploaderModules  自定义配置文件路径（JSON格式数组）。

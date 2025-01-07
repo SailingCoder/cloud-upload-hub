@@ -28,13 +28,15 @@ function loadDefaultConfig() {
   } else {
     // 没有配置文件时，使用命令行参数中的值
     configData = {
-      source: argv.source,
-      target: argv.target,
-      lastFileName: argv.lastFile || "index.html",
-      uploaderModules: JSON.parse(argv?.uploaderModules || '[]'),
       ...argv,
+      uploaderModules: JSON.parse(argv?.uploaderModules || '[]'),
     };
   }
+
+  // 默认赋值
+  configData.retryLimit = configData.retryLimit || 5;
+  configData.maxConcurrent = configData.maxConcurrent || 10;
+  configData.lastFile = configData.lastFile || "index.html";
   
   return configData; // 返回配置数据
 }
