@@ -2,14 +2,21 @@
   "name": "cloud-upload-hub",
   "version": "1.0.0",
   "description": "支持将文件同时上传至单个或者多个云存储服务，当前支持阿里云 OSS 和腾讯云 COS，支持扩展到更多云服务。",
-  "main": "./src/index.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist",
+    "bin"
+  ],
   "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "publish": "npm publish --loglevel verbose",
-    "uploaderOSS:tice": "cloud-upload-hub --source=src --target=test/sailing  --ossCredentials=./config/oss.tice.conf.json",
-    "uploaderCOS:tice": "cloud-upload-hub --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
-    "uploader:tice": "cloud-upload-hub --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
-    "uploaderRegistryOSS:tice": "cloud-upload-hub --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
+    "publish": "npm run build && npm publish --loglevel verbose",
+    "uploaderOSS:tice": "cloud-upload-hub --source=dist --target=test/sailing  --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderCOS:tice": "cloud-upload-hub --source=dist --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
+    "uploader:tice": "cloud-upload-hub --source=dist --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderRegistryOSS:tice": "cloud-upload-hub --source=dist --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
     "uploader:test": "cloud-upload-hub --mode=test"
   },
   "keywords": [
@@ -34,5 +41,15 @@
     "cos-nodejs-sdk-v5": "^2.14.6",
     "dayjs": "^1.11.13",
     "minimist": "^1.2.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "rollup": "^2.35.1",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }

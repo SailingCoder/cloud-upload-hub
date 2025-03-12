@@ -11,7 +11,7 @@ const getTargetPath = (mode) => {
 
 const defineConfig = ({ mode }) => {
   return {
-    source: 'src',  // 上传源路径
+    source: 'dist',  // 上传源路径
     target: getTargetPath(mode),  // 上传目标路径
     retryLimit: 5,  // 重试次数
     maxConcurrent: 10,  // 最大并发量
