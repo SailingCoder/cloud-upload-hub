@@ -1,6 +1,6 @@
-# multi-cloud-uploader - 轻量级前端多云上传库
+# cloud-upload-hub - 轻量级前端多云上传库
 
-**multi-cloud-uploader** 是一个轻量级的前端资源 Node 上传库，专为多云存储平台的文件上传而设计。它目前支持阿里云 OSS 和腾讯云 COS，也支持动态扩展其他云存储上传能力，未来将扩展到更多云存储服务。
+**cloud-upload-hub** 是一个轻量级的前端资源 Node 上传库，专为多云存储平台的文件上传而设计。它目前支持阿里云 OSS 和腾讯云 COS，也支持动态扩展其他云存储上传能力，未来将扩展到更多云存储服务。
 
 这个库的目的是通过简洁的 API，开发者可以轻松集成多个云平台的文件上传功能，无需重复实现不同平台的逻辑。
 
@@ -20,7 +20,7 @@
 通过 npm 安装此工具：
 
 ```bash
-npm install @cloud/multi-cloud-uploader --save-dev 
+npm install @cloud/cloud-upload-hub --save-dev 
 ```
 
 ## 配置方式
@@ -32,13 +32,13 @@ npm install @cloud/multi-cloud-uploader --save-dev
 通过命令行直接传入参数进行配置。这种方式适合快速上传和一次性任务。
 
 ```bash
-multi-cloud-uploader --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件>
+cloud-upload-hub --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件>
 ```
 
 **示例命令**：
 
 ```bash
-multi-cloud-uploader --source=dist --target=projectName/test --ossCredentials=./oss.test.conf.json 
+cloud-upload-hub --source=dist --target=projectName/test --ossCredentials=./oss.test.conf.json 
 ```
 
 ### 2. 使用 `uploader.config.js`
@@ -98,7 +98,7 @@ Credentials 目前支持 OSS 和 COS，二选一，必填项。
 **命令行**: 仅支持配置的地址（path）。
 
 ```bash
-multi-cloud-uploader --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件>
+cloud-upload-hub --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件>
 ```
 
 **uploader.config.js**: 支持三种模式：
@@ -144,11 +144,11 @@ uploaderRegistryOSS.js
 // 代码例子，可按照下面的代码进行修改。（代码就按照这个复制、粘贴，改改）
 /*
 "scripts": {
-  "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
+  "uploaderRegistryOSS:tice": "cloud-upload-hub --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
 },
 */
 const OSS = require('ali-oss')
-const { BaseUploader, registerUploader } = require('multi-cloud-uploader');
+const { BaseUploader, registerUploader } = require('cloud-upload-hub');
 
 class UploadCopyOss extends BaseUploader {
   constructor(options) {
@@ -200,7 +200,7 @@ registerUploader(UploadCopyOss, {
 
 ```json
 "scripts": {
-    "uploader:tice": "multi-cloud-uploader --mode=tice"
+    "uploader:tice": "cloud-upload-hub --mode=tice"
 }
 ```
 

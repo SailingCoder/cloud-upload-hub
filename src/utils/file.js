@@ -63,13 +63,13 @@ function displayHelp() {
   const stableVersion = packageJson.version;
 
   console.log(`
-      multi-cloud-uploader 本地上传工具，支持 OSS、COS 上传。
+      cloud-upload-hub 本地上传工具，支持 OSS、COS 上传。
       
       稳定版本：
-      multi-cloud-uploader@${stableVersion}
+      cloud-upload-hub@${stableVersion}
       
       使用方法：
-      multi-cloud-uploader --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件> --cosCredentials=<cos配置文件>
+      cloud-upload-hub --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件> --cosCredentials=<cos配置文件>
       
       参数说明：
       --ossCredentials          指定 OSS 配置文件路径。

@@ -1,16 +1,16 @@
 {
-  "name": "multi-cloud-uploader",
+  "name": "cloud-upload-hub",
   "version": "1.0.0",
-  "description": "支持多云存储平台的文件上传，当前支持阿里云 OSS 和腾讯云 COS，未来将扩展到更多云服务。",
+  "description": "支持将文件同时上传至单个或者多个云存储服务，当前支持阿里云 OSS 和腾讯云 COS，支持扩展到更多云服务。",
   "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish --loglevel verbose",
-    "uploaderOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --ossCredentials=./config/oss.tice.conf.json",
-    "uploaderCOS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
-    "uploader:tice": "multi-cloud-uploader --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
-    "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
-    "uploader:test": "multi-cloud-uploader --mode=test"
+    "uploaderOSS:tice": "cloud-upload-hub --source=src --target=test/sailing  --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderCOS:tice": "cloud-upload-hub --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
+    "uploader:tice": "cloud-upload-hub --source=src --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderRegistryOSS:tice": "cloud-upload-hub --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
+    "uploader:test": "cloud-upload-hub --mode=test"
   },
   "keywords": [
     "upload",
@@ -24,7 +24,7 @@
   "author": "Sailing",
   "license": "MIT",
   "bin": {
-    "multi-cloud-uploader": "bin/main.js"
+    "cloud-upload-hub": "bin/main.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

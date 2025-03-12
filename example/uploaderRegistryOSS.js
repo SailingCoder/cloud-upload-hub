@@ -2,11 +2,11 @@
 // 然后在命令行执行, 即可上传文件到阿里云 OSS
 /*
 "scripts": {
-  "uploaderRegistryOSS:tice": "multi-cloud-uploader --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
+  "uploaderRegistryOSS:tice": "cloud-upload-hub --source=src --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json"
 },
 */
 const OSS = require('ali-oss')
-const { BaseUploader, registerUploader } = require('multi-cloud-uploader');
+const { BaseUploader, registerUploader } = require('cloud-upload-hub');
 
 class UploadCopyOss extends BaseUploader {
   constructor(options) {
