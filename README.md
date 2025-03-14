@@ -1,6 +1,6 @@
 # cloud-upload-hub
 
-[![npm version](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/76c90be7dbe34e918471fe5cfa61fa47~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgU2FpbGluZw==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMzA3NTE4OTg4MTAwMjM3In0%3D\&rk3s=e9ecf3d6\&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018\&x-orig-expires=1742018633\&x-orig-sign=OLpdVCZg%2Fs22UHd5nxY%2BCOOu2Hg%3D)](https://www.npmjs.com/package/cloud-upload-hub)
+![npm version](https://img.shields.io/npm/v/cloud-upload-hub)
 
 一个轻量级的前端多云存储上传工具，支持阿里云 OSS、腾讯云 COS 等云存储服务，提供统一的接口和灵活的配置选项。
 
