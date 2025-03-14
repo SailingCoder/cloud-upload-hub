@@ -1,49 +1,46 @@
-# cloud-upload-hub - 轻量级前端多云上传库
+# cloud-upload-hub
 
-**cloud-upload-hub** 是一个轻量级的前端资源 Node 上传库，专为多云存储平台的文件上传而设计。它目前支持阿里云 OSS 和腾讯云 COS，也支持动态扩展其他云存储上传能力，未来将扩展到更多云存储服务。
+[![npm version](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/76c90be7dbe34e918471fe5cfa61fa47~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgU2FpbGluZw==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMzA3NTE4OTg4MTAwMjM3In0%3D\&rk3s=e9ecf3d6\&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018\&x-orig-expires=1742018633\&x-orig-sign=OLpdVCZg%2Fs22UHd5nxY%2BCOOu2Hg%3D)](https://www.npmjs.com/package/cloud-upload-hub)
+
+一个轻量级的前端多云存储上传工具，支持阿里云 OSS、腾讯云 COS 等云存储服务，提供统一的接口和灵活的配置选项。
 
 这个库的目的是通过简洁的 API，开发者可以轻松集成多个云平台的文件上传功能，无需重复实现不同平台的逻辑。
 
 ## 特性
 
-*   **多种云存储支持**：支持 OSS、COS 等，用户可动态选择单个或多个上传。
-*   **动态加载配置**：通过 uploaderModules 参数配置其他私有云或公有云的上传（支持扩展）。
-*   **易于扩展**：未来将支持更多云存储，如 AWS S3 和 Google Cloud Storage。
-*   **简化集成**：统一接口，简化文件上传流程。
-*   **请求头配置**：支持 OSS 和 COS 的独立请求头配置。
-*   **指定最后上传的文件**：默认支持 `index.html`。
-*   **重试机制**：自动重试上传，确保可靠性。
-*   **命令行与配置文件共存**：支持简单模式、复杂模式下的开发上传。
+*   🚀 **多云支持**：支持阿里云 OSS、腾讯云 COS 等云存储服务
+*   🔄 **灵活配置**：支持命令行参数和配置文件两种方式
+*   🛠 **易于扩展**：支持自定义上传器，轻松扩展其他云存储服务
+*   📊 **进度监控**：实时显示上传进度和状态
+*   🔄 **自动重试**：内置重试机制，提高上传可靠性
+*   📦 **轻量级**：零依赖，体积小巧
+*   🚀 **简化集成**：统一接口，简化文件上传流程。
+*   🛠 **请求头配置**：支持 OSS 和 COS 的独立请求头配置。
+*   🛠 **指定最后上传的文件**：默认 `index.html`。
 
-## 安装
-
-通过 npm 安装此工具：
+## 📦 安装
 
 ```bash
 npm install cloud-upload-hub --save-dev 
 ```
 
-## 配置方式
+## 🚀 快速开始
 
-该库支持两种配置方式：
-
-### 1. 命令行参数
-
-通过命令行直接传入参数进行配置。这种方式适合快速上传和一次性任务。
+### 1. 命令行方式
 
 ```bash
-cloud-upload-hub --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件>
+# 基础用法
+cloud-upload-hub --source=dist --target=my-project --ossCredentials=./config/oss.conf.json
+
+# 使用配置文件
+cloud-upload-hub --config=./uploader.config.js --mode=test
+或根目录下
+cloud-upload-hub --mode=test
 ```
 
-**示例命令**：
+### 2. 配置文件方式
 
-```bash
-cloud-upload-hub --source=dist --target=projectName/test --ossCredentials=./oss.test.conf.json 
-```
-
-### 2. 使用 `uploader.config.js`
-
-通过配置文件集中管理上传参数。这种方式适合长期项目或需要频繁上传的场景。
+创建 `uploader.config.js`：通过配置文件集中管理上传参数。这种方式适合长期项目或需要频繁上传的场景。
 
 **配置示例**：
 
@@ -55,23 +52,24 @@ const defineConfig = ({ mode }) => {
     retryLimit: 5,  // 重试次数
     maxConcurrent: 10,  // 最大并发量
     lastFile: 'index.html',  // 最后一个文件
-    ossCredentials: './config/oss.tice.conf.json',  // 包含 OSS 的具体配置文件路径
-    cosCredentials: async () => ({
-       SecretId: 'xxx',  // COS的秘密ID
-       SecretKey: 'xxx'  // COS的秘密密钥
+    ossCredentials: './config/oss.tice.conf.json',  // OSS 配置文件(密钥)
+    cosCredentials: async () => ({ // COS 配置
+       SecretId: 'xxx',
+       SecretKey: 'xxx'
+       ...
     }),
     uploaderModules: [], // 自定义上传模块路径或注入函数
-    onUploadSuccess(status) {  // 上传成功处理函数
+    onUploadSuccess(status) {
       console.log('上传成功:', status);
     },
-    onUploadFail(status) {  // 上传失败处理函数
+    onUploadFail(status) {
       console.error('上传失败:', status);
     }
   };
 };
-```
 
-`uploader.config.js` 可以配置在项目根目录下，也可以通过命令行配置路径文件。
+export default defineConfig;
+```
 
 ## 参数说明
 
@@ -90,24 +88,16 @@ const defineConfig = ({ mode }) => {
 | **onUploadSuccess** | 上传成功的回调函数，接收上传状态。                                                                | 否    | 否     | 是                     |
 | **onUploadFail**    | 上传失败的回调函数，接收失败状态。  onUploadFail(status<1:资源上传前；2：资源文件上传过程中；3：生效文件上传过程中；4：加载配置文件; 0: 未知错误>, message)                                                              | 否    | 否     | 是                     |
 
+### 云存储配置
 
-### Credentials
 
-Credentials 目前支持 OSS 和 COS，二选一，必填项。
+**uploader.config.js** 支持三种模式：
 
-**命令行**: 仅支持配置的地址（path）。
-
-```bash
-cloud-upload-hub --source=<源目录> --target=<目标目录> --ossCredentials=<oss配置文件>
-```
-
-**uploader.config.js**: 支持三种模式：
-
-1.  配置地址：指定 OSS 或 COS 的配置文件路径。
+1.  配置文件路径：指定 OSS 或 COS 的配置文件路径。
     ```js
     ossCredentials: './config/oss.tice.conf.json', 
     ```
-3.  数据格式对象：直接在配置中以对象形式提供相关凭据。
+3.  配置对象：直接在配置中以对象形式提供相关凭据。
     ```js
     ossCredentials: {
         SecretId: 'xxx',  // COS的秘密ID
@@ -115,13 +105,18 @@ cloud-upload-hub --source=<源目录> --target=<目标目录> --ossCredentials=<
         ...
     }, 
     ```
-5.  Promise 下的接口请求返回数据对象：通过异步接口请求返回的对象来提供凭据。
+5.  异步函数：Promise 下的接口请求返回数据对象：通过异步接口请求返回的对象来提供凭据。
     ```js
-    ossCredentials: () => {}, 
+    ossCredentials: async () => {
+      const response = await fetch('your-api');
+      return response.json();
+    }
     ```
 
 
-### 自定义上传模块配置
+### 自定义上传器
+
+1. 函数配置
 
 可以通过 `uploaderModules` 参数动态加载特定的上传器（除 OSS 和 COS 之外）配置文件，以满足不同的上传需求。
 
@@ -137,6 +132,8 @@ uploaderModules: [ // 自定义上传路径 或者 注入函数
   }
 ]
 ```
+
+2、 自定义文件配置
 
 uploaderRegistryOSS.js
 
