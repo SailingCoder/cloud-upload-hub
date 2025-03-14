@@ -2,12 +2,7 @@
   "name": "cloud-upload-hub",
   "version": "1.0.0",
   "description": "支持将文件同时上传至单个或者多个云存储服务，当前支持阿里云 OSS 和腾讯云 COS，支持扩展到更多云服务。",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "files": [
-    "dist",
-    "bin"
-  ],
+  "main": "./src/index.js",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
