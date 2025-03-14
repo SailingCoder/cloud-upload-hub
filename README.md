@@ -213,3 +213,30 @@ onUploadFail(status) {
   console.log('构建失败', status);
 },
 ```
+
+### 3. 上传日志什么样子？
+
+```json
+====== 共扫描了7个文件，开始上传资源文件。 ======
+
+[OSS][SUCCESS][1/7]: src/.DS_Store -> test/sailing/src/.DS_Store
+[OSS][SUCCESS][2/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
+[OSS][SUCCESS][3/7]: src/main.js -> test/sailing/src/main.js
+[OSS][SUCCESS][4/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
+[OSS][SUCCESS][5/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
+[OSS][SUCCESS][6/7]: src/utils/file.js -> test/sailing/src/utils/file.js
+
+[COS][SUCCESS][1/7]: src/main.js -> test/sailing/src/main.js
+[COS][SUCCESS][2/7]: src/.DS_Store -> test/sailing/src/.DS_Store
+[COS][SUCCESS][3/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
+[COS][SUCCESS][4/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
+[COS][SUCCESS][5/7]: src/utils/file.js -> test/sailing/src/utils/file.js
+[COS][SUCCESS][6/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
+
+====== 开始上传生效文件。 ====== 
+
+[OSS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+[COS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+
+====== 全部文件上传成功(7个) ======
+```
