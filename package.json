@@ -13,10 +13,10 @@
     "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm run build && npm publish --loglevel verbose",
-    "uploaderOSS:tice": "cloud-upload-hub --source=dist --target=test/sailing  --ossCredentials=./config/oss.tice.conf.json",
-    "uploaderCOS:tice": "cloud-upload-hub --source=dist --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json",
-    "uploader:tice": "cloud-upload-hub --source=dist --target=test/sailing  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
-    "uploaderRegistryOSS:tice": "cloud-upload-hub --source=dist --target=test/sailing  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
+    "uploaderOSS:tice": "cloud-upload-hub --source=dist --target=sailing/tice  --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderCOS:tice": "cloud-upload-hub --source=dist --target=sailing/tice  --cosCredentials=./config/cos.tice.conf.json",
+    "uploader:tice": "cloud-upload-hub --source=dist --target=sailing/tice  --cosCredentials=./config/cos.tice.conf.json --ossCredentials=./config/oss.tice.conf.json",
+    "uploaderRegistryOSS:tice": "cloud-upload-hub --source=dist --target=sailing/tice  --uploaderModules='[\"./example/uploaderRegistryOSS.js\"]' --ossCopyConfig=./config/oss.tice.conf.json",
     "uploader:test": "cloud-upload-hub --mode=test"
   },
   "keywords": [
