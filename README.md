@@ -216,7 +216,7 @@ onUploadFail(status) {
 
 ### 3. 上传日志什么样子？
 
-```json
+```log
 ====== 共扫描了7个文件，开始上传资源文件。 ======
 
 [OSS][SUCCESS][1/7]: src/.DS_Store -> test/sailing/src/.DS_Store
