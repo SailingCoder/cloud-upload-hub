@@ -38,6 +38,20 @@ cloud-upload-hub --config=./uploader.config.js --mode=test
 cloud-upload-hub --mode=test
 ```
 
+或者在package.json中：
+
+```json
+"scripts": {
+    "uploader:test": cloud-upload-hub --mode=test
+},
+```
+
+执行
+
+```bash
+npm run uploader:test
+```
+
 ### 2. 配置文件方式
 
 创建 `uploader.config.js`：通过配置文件集中管理上传参数。这种方式适合长期项目或需要频繁上传的场景。
