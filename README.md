@@ -20,7 +20,7 @@
 通过 npm 安装此工具：
 
 ```bash
-npm install @cloud/cloud-upload-hub --save-dev 
+npm install cloud-upload-hub --save-dev 
 ```
 
 ## 配置方式
