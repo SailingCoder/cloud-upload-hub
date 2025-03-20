@@ -233,12 +233,18 @@ onUploadFail(status) {
 ```log
 ====== 共扫描了7个文件，开始上传资源文件。 ======
 
+OSS资源文件，开始上传...
+
 [OSS][SUCCESS][1/7]: src/.DS_Store -> test/sailing/src/.DS_Store
 [OSS][SUCCESS][2/7]: src/upload/cosUpload.js -> test/sailing/src/upload/cosUpload.js
 [OSS][SUCCESS][3/7]: src/main.js -> test/sailing/src/main.js
 [OSS][SUCCESS][4/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
 [OSS][SUCCESS][5/7]: src/utils/tasks.js -> test/sailing/src/utils/tasks.js
 [OSS][SUCCESS][6/7]: src/utils/file.js -> test/sailing/src/utils/file.js
+
+OSS资源文件，上传完成。
+
+COS资源文件，开始上传...
 
 [COS][SUCCESS][1/7]: src/main.js -> test/sailing/src/main.js
 [COS][SUCCESS][2/7]: src/.DS_Store -> test/sailing/src/.DS_Store
@@ -247,10 +253,21 @@ onUploadFail(status) {
 [COS][SUCCESS][5/7]: src/utils/file.js -> test/sailing/src/utils/file.js
 [COS][SUCCESS][6/7]: src/upload/ossUpload.js -> test/sailing/src/upload/ossUpload.js
 
+COS资源文件，上传完成。
+
 ====== 开始上传生效文件。 ====== 
 
+OSS生效文件，开始上传...
+
 [OSS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+
+OSS生效文件，上传完成。
+
+COS生效文件，开始上传...
+
 [COS][SUCCESS][7/7]: src/index.html -> test/sailing/src/index.html
+
+COS生效文件，上传完成。
 
 ====== 全部文件上传成功(7个) ======
 ```
