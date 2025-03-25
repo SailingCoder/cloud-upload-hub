@@ -7,7 +7,7 @@ class BaseUploader {
     this.source = options.source;
     this.target = options.target;
     this.retryLimit = options.retryLimit || 5;
-    this.maxConcurrent = options.maxConcurrent || 10; // 并发上传数量控制
+    this.maxConcurrent = options.maxConcurrent || 20; // 并发上传数量控制
     this.successTotal = 0;
     this.fileTotal = options.fileTotal || 0;
     this.type = options.type;

@@ -64,7 +64,7 @@ const defineConfig = ({ mode }) => {
     source: 'src',  // 上传源路径
     target: gettarget(mode),  // 上传目标路径，根据 mode 动态获取
     retryLimit: 5,  // 重试次数
-    maxConcurrent: 10,  // 最大并发量
+    maxConcurrent: 20,  // 最大并发量
     lastFile: 'index.html',  // 最后一个文件
     ossCredentials: './config/oss.tice.conf.json',  // OSS 配置文件(密钥)
     cosCredentials: async () => ({ // COS 配置

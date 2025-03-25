@@ -35,7 +35,7 @@ function loadDefaultConfig() {
 
   // 默认赋值
   configData.retryLimit = configData.retryLimit || 5;
-  configData.maxConcurrent = configData.maxConcurrent || 10;
+  configData.maxConcurrent = configData.maxConcurrent || 20;
   configData.lastFile = configData.lastFile || "index.html";
   
   return configData; // 返回配置数据

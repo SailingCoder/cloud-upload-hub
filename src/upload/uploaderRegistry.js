@@ -48,7 +48,7 @@ function registerUploader(UploaderClass, options) {
       source: configData.source,
       target: configData.target,
       retryLimit: Number(configData.retryLimit) || 5,
-      maxConcurrent: Number(configData.maxConcurrent) || 10,
+      maxConcurrent: Number(configData.maxConcurrent) || 20,
       headers,
       type,
       format: configData.format,
